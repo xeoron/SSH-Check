@@ -1,6 +1,6 @@
 (*
 	Name: SSH-Check
-	Version: 0.3.2
+	Version: 0.3.3
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -8,7 +8,7 @@
 	
 	Default program is Firefox and ssh service tunnelr.com and
 	To reprogram what program you want to launch by default, 
-	drop a program onto SSH-Check
+	drop a program onto SSH-Check.
 	
 	NOTE: 
 	For even more security this program is best combined with a cron job to 
@@ -21,16 +21,14 @@ property program : "Firefox"
 property programBackup : "Firefox" #don't remove to overt droplet bug
 
 on open these_items
-	(* these_items holds a alias list that looks like this:
-   	   "hostname:Applications:ProgName.app:"
- 	*)
+	### these_items holds a alias list that looks like this: "hostname:Applications:ProgName.app:"
 	
 	set prog to ""
 	set prog to these_items as string
 	
 	#isolate only the program-name, then strip out ".app" & set it to the global 'program' variable
 	set text item delimiters to ":"
-	set prog to text item 3 of prog --3
+	set prog to text item 3 of prog
 	set text item delimiters to "."
 	set prog to text item 1 of prog
 	copy prog to program
@@ -57,7 +55,6 @@ on isAppRunning(cmd)
 	else
 		--msg("no!")
 		return "No"
-		
 	end if
 end isAppRunning
 
@@ -98,7 +95,7 @@ on run
 	set cmdAppKill to ps & " | " & grepProg & " | " & grepDrop & " | " & awkTwo & " | " & xkill
 	--msg("cmdAppKill is this: " & cmdAppKill)
 	
-	try #check for ssh connected to service X
+	try #check for ssh connected to defined service
 		set result to item 2 of paragraphs of (do shell script cmdSSH)
 	on error #throws error if it fails
 		if isAppRunning(cmdAppRun) is "Yes" then
@@ -110,9 +107,8 @@ on run
 		return
 	end try
 	
-	#As if you want to run your program
+	#Ask if you want to run your program, kill it, or quietly stop
 	set titlemsg to "Active SSH Connection to: " & result
-	
 	if isAppRunning(cmdAppRun) is "Yes" then # should we kill & restart the running app?
 		set btnOpt to {"Restart", "Exit SSH-Check", "Turn Off"}
 		set qMsg to program & " is running! You can now Restart It, Turn it Off, or Exit SSH-Check"
@@ -133,6 +129,7 @@ on run
 		end if
 	end if
 	
+	#Prepare to launch a program
 	set appPath to POSIX path of ("/Applications/")
 	--msg("apppath: " &appPath)
 	set nameOffset to offset of program in appPath
@@ -140,7 +137,7 @@ on run
 	set folderPath to text 1 thru (nameOffset - 1) of appPath
 	--msg("folderpath: " & folderPath)
 	try #start program up in the background
-		do shell script folderPath & program & ".app" & "/Contents/MacOS/program  &> /dev/null &"
+		do shell script folderPath & program & ".app" & "/Contents/MacOS/program  & >/dev/null &"
 		delay 1
 		tell application program to activate
 	on error
