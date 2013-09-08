@@ -1,6 +1,6 @@
 (*
 	Name: SSH-Check
-	Version: 0.3.1
+	Version: 0.3.2
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -52,10 +52,10 @@ on isAppRunning(cmd)
 		return "No" -- if there was no grep match then the program is currently off
 	end try
 	if result contains program then
-		--display dialog "Found: " & result with title program & " is aleady running!"
+		--msg("Found: " & result with title program & " is aleady running!")
 		return "Yes"
 	else
-		--display dialog "no!"
+		--msg("no!")
 		return "No"
 		
 	end if
@@ -90,11 +90,13 @@ on run
 	set awkOne to "awk '{print $8}'"
 	set awkTwo to "awk '{print $1}'"
 	set xkill to "xargs kill -9"
-	--
-	set cmdSSH to ps & " | " & grepSSH & " | " & grepConnect & " | " & awkOne
-	set cmdAppRun to ps & " | " & grepProg & " | " & grepDrop
-	set cmdAppKill to ps & " | " & grepProg & " | " & grepDrop & " | " & awkTwo & " | " & xkill
 	
+	set cmdSSH to ps & " | " & grepSSH & " | " & grepConnect & " | " & awkOne
+	--msg("cmdSSH is this: " & cmdSSH)
+	set cmdAppRun to ps & " | " & grepProg & " | " & grepDrop
+	--msg("cmdAppRun is this: " & cmdAppRun)
+	set cmdAppKill to ps & " | " & grepProg & " | " & grepDrop & " | " & awkTwo & " | " & xkill
+	--msg("cmdAppKill is this: " & cmdAppKill)
 	
 	try #check for ssh connected to service X
 		set result to item 2 of paragraphs of (do shell script cmdSSH)
