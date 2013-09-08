@@ -1,6 +1,6 @@
 (*
 	Name: SSH-Check
-	Version: 0.3.0
+	Version: 0.3.1
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -39,7 +39,7 @@ on open these_items
 end open
 
 on resetProgram()
-	#fix empty list…. stops droplet bug
+	#fix empty list and stops droplet bug
 	if program is "" then
 		copy programBackup to program
 	end if
