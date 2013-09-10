@@ -1,6 +1,6 @@
 (*
 	Name: SSH-Check
-	Version: 0.3.3
+	Version: 0.3.4
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -21,7 +21,11 @@ property program : "Firefox"
 property programBackup : "Firefox" #don't remove to overt droplet bug
 
 on open these_items
-	### these_items holds a alias list that looks like this: "hostname:Applications:ProgName.app:"
+	(* these_items holds a alias list that looks like this: "hostname:Applications:ProgName.app:"
+	NOTE: global variables store whatever you put in them, even after the program restarts 
+	it will contain what was last placed in it, there by ignoring whatever the 
+	hardcoded preset value is. By using bug/feature, reprogramming the default launch 
+	program is easy using the below droplet code *)
 	
 	set prog to ""
 	set prog to these_items as string
@@ -111,7 +115,7 @@ on run
 	set titlemsg to "Active SSH Connection to: " & result
 	if isAppRunning(cmdAppRun) is "Yes" then # should we kill & restart the running app?
 		set btnOpt to {"Restart", "Exit SSH-Check", "Turn Off"}
-		set qMsg to program & " is running! You can now Restart It, Turn it Off, or Exit SSH-Check"
+		set qMsg to program & " is running! You may either: Restart It, Turn it Off, or Exit SSH-Check"
 		set choice to button returned of (display dialog qMsg buttons btnOpt default button "Exit SSH-Check" with title titlemsg)
 		if choice is "Restart" then
 			killRunningApp(cmdAppKill)
