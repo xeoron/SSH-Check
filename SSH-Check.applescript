@@ -1,6 +1,7 @@
+#! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.3.4
+	Version: 0.4.0
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -19,6 +20,7 @@
 property service : "tunnelr.com"
 property program : "Firefox"
 property programBackup : "Firefox" #don't remove to overt droplet bug
+property countdown : "6" #time out in X seconds
 
 on open these_items
 	(* these_items holds a alias list that looks like this: "hostname:Applications:ProgName.app:"
@@ -115,7 +117,7 @@ on run
 	set titlemsg to "Active SSH Connection to: " & result
 	if isAppRunning(cmdAppRun) is "Yes" then # should we kill & restart the running app?
 		set btnOpt to {"Restart", "Exit SSH-Check", "Turn Off"}
-		set qMsg to program & " is running! You may either: Restart It, Turn it Off, or Exit SSH-Check"
+		set qMsg to program & " is running! Do you want to: Restart It, Turn it Off, or Exit SSH-Check"
 		set choice to button returned of (display dialog qMsg buttons btnOpt default button "Exit SSH-Check" with title titlemsg)
 		if choice is "Restart" then
 			killRunningApp(cmdAppKill)
@@ -126,11 +128,16 @@ on run
 			return
 		end if
 	else
-		set btnOpt to {"Yes", "No"}
-		set yesOrNo to button returned of (display dialog "Do still want to launch " & program & "?" buttons btnOpt default button "Yes" with title titlemsg)
-		if yesOrNo is "No" then
+		set btnOpt to {"Launch", "Stop"}
+		set qMsg to "Starting " & program & " in " & countdown & " seconds!"
+		try
+			set yesOrNo to button returned of (display dialog qMsg buttons btnOpt default button "Launch" with title titlemsg giving up after countdown)
+			if yesOrNo is "Stop" then
+				return
+			end if
+		on error
 			return
-		end if
+		end try
 	end if
 	
 	#Prepare to launch a program
