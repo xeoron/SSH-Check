@@ -25,6 +25,8 @@
 	<string>droplet</string>
 	<key>CFBundleIconFile</key>
 	<string>droplet</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.apple.ScriptEditor.id.SSH-Check</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -45,15 +47,15 @@
 		<key>dividerCollapsed</key>
 		<false/>
 		<key>eventLogLevel</key>
-		<integer>-1</integer>
+		<integer>2</integer>
 		<key>name</key>
 		<string>ScriptWindowState</string>
 		<key>positionOfDivider</key>
-		<real>543</real>
+		<real>612</real>
 		<key>savedFrame</key>
-		<string>133 94 984 924 0 0 1920 1058 </string>
+		<string>780 56 863 1002 0 0 1920 1058 </string>
 		<key>selectedTabView</key>
-		<string>result</string>
+		<string>event log</string>
 	</dict>
 </dict>
 </plist>
