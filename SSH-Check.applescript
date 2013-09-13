@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.4.0
+	Version: 0.4.1
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -103,6 +103,10 @@ on run
 	
 	try #check for ssh connected to defined service
 		set result to item 2 of paragraphs of (do shell script cmdSSH)
+		if result is "x" or result is "" then
+			display dialog "Don't run " & program & ", because there's no connection to " & service & "." with title "SSH Service is down!"
+			return
+		end if
 	on error #throws error if it fails
 		if isAppRunning(cmdAppRun) is "Yes" then
 			display dialog "It is not safe to run " & program & ". Force it to quit by pressing \"OK\"!" with title "SSH Service is down!"
