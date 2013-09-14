@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.4.2
+	Version: 0.4.3
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -49,9 +49,9 @@ on resetProgram()
 	end if
 end resetProgram
 
-on isAppRunning(cmd)
+on isAppRunning()
 	try
-		set result to do shell script cmd
+		set result to do shell script "ps x | grep " & program & ".app | grep -v grep"
 	on error
 		return "No" -- if there was no grep match then the program is currently off
 	end try
@@ -62,9 +62,9 @@ on isAppRunning(cmd)
 	end if
 end isAppRunning
 
-on killRunningApp(cmd)
+on killRunningApp()
 	try
-		do shell script cmd
+		do shell script "ps x | grep " & program & ".app | grep -v grep | awk '{print $1}' | xargs kill -9"
 	on error
 		return
 	end try
@@ -90,22 +90,10 @@ on run
 	resetProgram()
 	
 	set result to {}
-	set ps to "ps x"
-	set grepProg to "grep '" & program & ".app'"
-	set grepDrop to "grep -v grep"
-	set grepSSH to "grep -i ssh"
-	set grepConnect to "grep '.*@.*" & service & "'"
-	set awkOne to "awk '{print $8}'"
-	set awkTwo to "awk '{print $1}'"
-	set xkill to "xargs kill -9"
-	
-	set cmdSSH to ps & " | " & grepSSH & " | " & grepConnect & " | " & awkOne
-	set cmdAppRun to ps & " | " & grepProg & " | " & grepDrop
-	set cmdAppKill to ps & " | " & grepProg & " | " & grepDrop & " | " & awkTwo & " | " & xkill
-	
 	set tunnel to ""
 	set titlemsg to "SSH Service is Down!"
 	try #check for ssh connected to defined service
+		set cmdSSH to "ps x | grep -i ssh | grep '.*@.*" & service & "' | awk '{print $8}'"
 		set result to item 2 of paragraphs of (do shell script cmdSSH)
 		copy result to tunnel
 		if serviceAlive(tunnel) is equal to 0 then
@@ -113,9 +101,9 @@ on run
 			return
 		end if
 	on error #throws error if it fails
-		if isAppRunning(cmdAppRun) is "Yes" and serviceAlive(tunnel) is equal to 0 then
+		if isAppRunning() is "Yes" and serviceAlive(tunnel) is equal to 0 then
 			msg("It is not safe to run " & program & ". Force it to quit by pressing \"OK\"!", titlemsg)
-			killRunningApp(cmdAppKill)
+			killRunningApp()
 		else if serviceAlive(tunnel) is equal to 0 then
 			msg("Don't run " & program & ", because there's no connection to " & service & ".", titlemsg)
 		end if
@@ -124,14 +112,14 @@ on run
 	
 	#Ask if you want to run your program, kill it, or quietly stop
 	set titlemsg to "Active SSH Connection to: " & tunnel
-	if isAppRunning(cmdAppRun) is "Yes" then # should we kill & restart the running app?
+	if isAppRunning() is "Yes" then # should we kill & restart the running app?
 		set btnOpt to {"Restart", "Exit SSH-Check", "Turn Off"}
 		set qMsg to program & " is running! Do you want to: Restart It, Turn it Off, or Exit SSH-Check"
 		set choice to button returned of (display dialog qMsg buttons btnOpt default button "Exit SSH-Check" with title titlemsg)
 		if choice is "Restart" then
-			killRunningApp(cmdAppKill)
+			killRunningApp()
 		else if choice is "Turn Off" then
-			killRunningApp(cmdAppKill)
+			killRunningApp()
 			return
 		else #choice equals Cancel
 			return
