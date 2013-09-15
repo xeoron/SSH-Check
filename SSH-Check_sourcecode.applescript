@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.5.0
+	Version: 0.5.1
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -101,15 +101,15 @@ end notify
 
 on isAppRunning()
 	try
-		set result to do shell script "ps x | grep " & program & ".app | grep -v grep"
+		tell application program
+			if it is running then
+				return true
+			end if
+		end tell
 	on error
-		return false -- if there was no grep match then the program is currently off
-	end try
-	if result contains program then
-		return true
-	else
 		return false
-	end if
+	end try
+	return false
 end isAppRunning
 
 on killRunningApp()
