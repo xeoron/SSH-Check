@@ -67,7 +67,7 @@ end FileExists
 
 on osXVersion()
 	set text item delimiters to "."
-	if FileExists(DNCLocation) is equal to true and ((text item 2 of (system version of (system info))) as number) ³ 8 then
+	if FileExists(DNCLocation) is equal to true and ((text item 2 of (system version of (system info))) as number) >= 8 then
 		set DisplayNoticeCenter to true
 	else
 		set DisplayNoticeCenter to false
