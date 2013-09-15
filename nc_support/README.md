@@ -5,12 +5,13 @@ DisplayNotificationCenterAlertAction is from <a href="http://www.automatedworkfl
 Setup Guide
 
 	0) Requires OS X.8 (Mountain Lion) or higher
-	1) Install Ben Waldie's Display Notification Centert Alert Automator Action script from here:
+	1) Download and install Ben Waldie's Display Notification Centert Alert Automator Action script from here:
 		http://www.automatedworkflows.com/2012/08/26/display-notification-center-alert-automator-action-1-0-0/
+	2) Create a new workflow in Automator containing only the Display Notification Center Alert action.
 
 <img src="https://github.com/xeoron/SSH-Check/blob/master/images/automator_nc_workflow.png?raw=true"/>
 
-	2) Create a new workflow in Automator containing only the Display Notification Center Alert action.
+
 	3) In the variables section at the bottom of the workflow construction area in Automator's window, create three variables named title, subtitle, and message.
 	4) Give message a default value like "Notification sent." You can leave the default values other two blank.
 	5) Drag each variable to its corresponding field in the Display Notification Center Alert action.
