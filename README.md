@@ -30,7 +30,7 @@ Mac OS X and AppleScript Editor to compile.
 Notification Center - Commandline Support
 
 	0) Requires OS X.8 (Mountain Lion) or higher
-	1) Install Ben Waldie's Display Notification Centert Alert Automator Action script from <a href="http://www.automatedworkflows.com/2012/08/26/display-notification-center-alert-automator-action-1-0-0/"here</a>
+	1) Install Ben Waldie's Display Notification Centert Alert Automator Action script from <a href="http://www.automatedworkflows.com/2012/08/26/display-notification-center-alert-automator-action-1-0-0/">here</a>.
 
 <img src="https://github.com/xeoron/SSH-Check/blob/master/images/automator_nc_workflow.png?raw=true"/>
 	
