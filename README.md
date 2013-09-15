@@ -25,9 +25,9 @@ You will have to change the service value, in the source code, to meet your need
 
 Requirements
 =====
-Mac OS X and AppleScript Editor to compile.
+Mac OS X Snow Leopard or higher
 
-Notification Center - Commandline Support
+For Extra functionality: Notification Center - Commandline Support
 
 	0) Requires OS X.8 (Mountain Lion) or higher
 	1) Install Ben Waldie's Display Notification Centert Alert Automator Action script from here:
