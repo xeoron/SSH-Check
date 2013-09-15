@@ -27,7 +27,7 @@ Requirements
 =====
 Mac OS X Snow Leopard or higher
 
-For Extra functionality: Notification Center - Commandline Support
+For NonDisruptive Messages: Install Commandline Support for the Notification Center
 
 	0) Requires OS X.8 (Mountain Lion) or higher
 	1) Install Ben Waldie's Display Notification Centert Alert Automator Action script from here:
