@@ -1,0 +1,24 @@
+Notification Center - Commandline Support
+====
+DisplayNotificationCenterAlertAction is from <a href="http://www.automatedworkflows.com/2012/08/26/display-notification-center-alert-automator-action-1-0-0/">automatedworkflows.com</a>
+
+Setup Guide
+
+	0) Requires OS X.8 (Mountain Lion) or higher
+	1) Install Ben Waldie's Display Notification Centert Alert Automator Action script from <a href="http://www.automatedworkflows.com/2012/08/26/display-notification-center-alert-automator-action-1-0-0/"here</a>
+
+<img src="https://github.com/xeoron/SSH-Check/blob/master/images/automator_nc_workflow.png?raw=true"/>
+
+	2) Create a new workflow in Automator containing only the Display Notification Center Alert action.
+	3) In the variables section at the bottom of the workflow construction area in Automator's window, create three variables named title, subtitle, and message.
+	4) Give message a default value like "Notification sent." You can leave the default values other two blank.
+	5) Drag each variable to its corresponding field in the Display Notification Center Alert action.
+	6) Save the workflow as Display Notification.wflow. A good place to save it is in ~/Library/Workflows (create the folder if necessary).
+
+Usage
+===
+Now you can display a notification from the command line using the following command:
+
+		automator -D title='Title text' -D subtitle='Subtitle text' -D message='Message text' ~/Library/Workflows/'Display Notification.wflow'  
+
+
