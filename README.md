@@ -40,6 +40,6 @@ SSH-Check auto-installs Display_Notification.workflow in ~/.ssh-check for you, b
 
 Note: you can display a notification from the command line using the following command:
 
-		automator -D title='Title text' -D subtitle='Subtitle text' -D message='Message text' ~/.ssh-check/Display_Notification.workflow
+	automator -D title='Title text' -D subtitle='Subtitle text' -D message='Message text' ~/.ssh-check/Display_Notification.workflow
   
 	
