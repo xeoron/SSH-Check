@@ -27,16 +27,17 @@ Requirements
 =====
 Mac OS X Snow Leopard or higher
 
-For NoneDisruptive Messages on OS X.8 (Mountain Lion) or higher, then Install Commandline Support for the Notification Center using Ben Waldie's Display Notification Centert Alert Automator Action script. Download it from here:
+For NoneDisruptive Messages on OS X.8 (Mountain Lion) or higher the following is required
+
+	1) Commandline support for the Notification Center using Ben Waldie's Display Notification Centert Alert Automator Action script.
+	2) Display_Notification.workflow 
+
+SSH-Check auto-installs Display_Notification.workflow in ~/.ssh-check for you, but requires you to manually download and install Ben Waldie's Automator script here:
 
  	http://www.automatedworkflows.com/2012/08/26/display-notification-center-alert-automator-action-1-0-0/	
 
-Note: SSH-Check installs Display_Notification.workflow at this location
 
-	~/.ssh-check
-
-
-Now you can display a notification from the command line using the following command:
+Note: you can display a notification from the command line using the following command:
 
 		automator -D title='Title text' -D subtitle='Subtitle text' -D message='Message text' ~/.ssh-check/Display_Notification.workflow
   
