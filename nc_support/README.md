@@ -15,12 +15,13 @@ Setup Guide
 	3) In the variables section at the bottom of the workflow construction area in Automator's window, create three variables named title, subtitle, and message.
 	4) Give message a default value like "Notification sent." You can leave the default values other two blank.
 	5) Drag each variable to its corresponding field in the Display Notification Center Alert action.
-	6) Save the workflow as Display Notification.wflow. A good place to save it is in ~/Library/Workflows (create the folder if necessary).
+	6) Save the workflow as Display_Notification.wflow. A good place to save it is in ~/Library/Workflows/Applications (create the folder if necessary).
 
 Usage
 ===
 Now you can display a notification from the command line using the following command:
 
-		automator -D title='Title text' -D subtitle='Subtitle text' -D message='Message text' ~/Library/Workflows/'Display Notification.wflow'  
+		automator -D title='Title text' -D subtitle='Subtitle text' -D message='Message text' ~/Library/Workflows/Applications/Display_Notification.workflow
+
 
 

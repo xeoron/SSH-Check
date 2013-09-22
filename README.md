@@ -29,25 +29,17 @@ Mac OS X Snow Leopard or higher
 
 For NonDisruptive Messages: Install Commandline Support for the Notification Center
 
-	0) Requires OS X.8 (Mountain Lion) or higher
-	1) Download and install Ben Waldie's Display Notification Centert Alert Automator Action script from here:
-		http://www.automatedworkflows.com/2012/08/26/display-notification-center-alert-automator-action-1-0-0/	
-	2) Create a new workflow in Automator containing only the Display Notification Center Alert action.
-	
-<img src="https://github.com/xeoron/SSH-Check/blob/master/images/automator_nc_workflow.png?raw=true"/>
+ 0) Requires OS X.8 (Mountain Lion) or higher
+ 1) Download and install Ben Waldie's Display Notification Centert Alert Automator Action script from here:
+ 		http://www.automatedworkflows.com/2012/08/26/display-notification-center-alert-automator-action-1-0-0/	
 
-	3) In the variables section at the bottom of the workflow construction area in Automator's window, create three variables named title, subtitle, and message.
-	4) Give message a default value like "Notification sent." You can leave the default values other two blank.
-	5) Drag each variable to its corresponding field in the Display Notification Center Alert action.
-	6) Save the workflow as Display Notification.wflow. A good place to save it is in ~/Library/Workflows (create the folder if necessary).
+Note: SSH-Check installs Display_Notification.workflow at this location
+
+	~/.ssh-check
+
 
 Now you can display a notification from the command line using the following command:
 
-		automator -D title='Title text' -D subtitle='Subtitle text' -D message='Message text' ~/Library/Workflows/'Display Notification.wflow'  
-
-Note: SSH-Check assumes the Display_Notification.workflow is installed at this location
-
-	/Library/Workflows/
-
-therefore, adjust the name and location in the SSH-Check sourcecode as needed or create a Bash Alias.
+		automator -D title='Title text' -D subtitle='Subtitle text' -D message='Message text' ~/.ssh-check/Display_Notification.workflow
+  
 	
