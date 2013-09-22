@@ -27,10 +27,8 @@ Requirements
 =====
 Mac OS X Snow Leopard or higher
 
-For NonDisruptive Messages: Install Commandline Support for the Notification Center
+For NonDisruptive Messages on OS X.8 (Mountain Lion) or higher: Install Commandline Support for the Notification Center using Ben Waldie's Display Notification Centert Alert Automator Action script. Download it from here:
 
- Requires OS X.8 (Mountain Lion) or higher
- Download and install Ben Waldie's Display Notification Centert Alert Automator Action script:
  	http://www.automatedworkflows.com/2012/08/26/display-notification-center-alert-automator-action-1-0-0/	
 
 Note: SSH-Check installs Display_Notification.workflow at this location
