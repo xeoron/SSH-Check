@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.5.1
+	Version: 0.5.4
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -22,8 +22,9 @@ property program : "Firefox"
 property programBackup : "Firefox" #don't remove to overt droplet bug
 
 property countdown : "6" #time out in seconds
-property DNCLocation : "~/Library/Workflows/Display_Notification.workflow"
-property DisplayNoticeCenter : false #script switchings to true when running on OS X.8 or higher & if DNCLocation exists
+property DNCLocation : "~/.ssh-check/Display_Notification.workflow"
+property DNCA : "~/Library/Automator/Display Notification Center Alert.action"
+property DisplayNoticeCenter : false #script switchings to true when running on OS X.8 or higher & if "DNCLocation & DNCA" exists
 
 on open these_items
 	(* these_items holds a alias list that looks like this: "hostname:Applications:ProgName.app:"
@@ -50,24 +51,39 @@ end open
 
 on resetProgram()
 	#fix empty list and stops droplet bug
+	
 	if program is "" then
 		copy programBackup to program
 	end if
+	set DisplayNoticeCenter to false
 end resetProgram
 
 on FileExists(theFile)
 	tell application "System Events"
 		if exists file theFile then
 			return true
-		else
-			return false
 		end if
 	end tell
+	return false
 end FileExists
+
+on FolderExists(theFolder)
+	--msg("folderexists - checking this place", "", theFolder)
+	try
+		tell application "System Events"
+			if exists folder theFolder then
+				return true
+			end if
+		end tell
+	on error
+		return false
+	end try
+	return false
+end FolderExists
 
 on osXVersion()
 	set text item delimiters to "."
-	if FileExists(DNCLocation) is equal to true and ((text item 2 of (system version of (system info))) as number) >= 8 then
+	if FileExists(DNCLocation) is equal to true and FileExists(DNCA) is true and ((text item 2 of (system version of (system info))) as number) ³ 8 then
 		set DisplayNoticeCenter to true
 	else
 		set DisplayNoticeCenter to false
@@ -82,10 +98,10 @@ on notify(title, subtitle, message)
 	3) In the variables section at the bottom of the workflow construction area in Automator's window, create three variables named title, subtitle, and message.
 	4) Give message a default value like "Notification sent." You can leave the default values other two blank.
 	5) Drag each variable to its corresponding field in the Display Notification Center Alert action.
-	6) Save the workflow as Display Notification.wflow. A good place to save it is in ~/Library/Workflows (create the folder if necessary).
+	6) Save the workflow as Display Notification.wflow. A good place to save it is in ~/.ssh-check (create the folder if necessary).
 
 	Now you can display a notification from the command line using the following command:
-		automator -D title='Title text' -D subtitle='Subtitle text' -D message='Message text' ~/Library/Workflows/'Display Notification.wflow'  
+		automator -D title='Title text' -D subtitle='Subtitle text' -D message='Message text' '~/.ssh-check/Display Notification.wflow'  
  *)
 	
 	if title as text is not "" then set title to " -D title=" & quoted form of (title as text)
@@ -151,18 +167,70 @@ on serviceAlive()
 	end try
 end serviceAlive
 
+on sshCheckSettings() #return bool
+	set configFolder to ".ssh-check"
+	set configPath to "~/" & configFolder
+	
+	if FileExists(DNCA) is false and ((text item 2 of (system version of (system info))) as number) ³ 8 then
+		msg(DNCA, "", "automator notification is not installed. Get a copy here: http://www.automatedworkflows.com/2012/08/26/display-notification-center-alert-automator-action-1-0-0/")
+		return false
+	end if
+	
+	if FolderExists(configPath) is false or FileExists(DNCLocation) is false then
+		set cmdMakePath to "mkdir -p" & space & configPath
+		set mypath to "cd " & configPath & " && "
+		set DNWorkflow to "dn.workflow.zip"
+		# culr command: curl -L -o foobar.zip "https://github.com/xeoron/SSH-Check/blob/master/install/Display_Notification.workflow.zip?raw=true"
+		set cmdCurl to mypath & "curl -L -o " & DNWorkflow & space & quoted form of "https://github.com/xeoron/SSH-Check/blob/master/install/Display_Notification.workflow.zip?raw=true"
+		set cmdUnzip to mypath & "unzip -u dn.workflow.zip"
+		set cmdCleanUp to mypath & "rm -rf __MACOSX/" & space & DNWorkflow
+		#msg("cmdmakepath:", "", cmdMakePath)
+		#msg("cmdCurl:", "", cmdCurl)
+		#msg("cmdUnzip", "", cmdUnzip)
+		#msg("cmdCleanup", "", cmdCleanUp)
+		
+		try
+			if FolderExists(configPath) is false then
+				do shell script cmdMakePath
+			end if
+			
+			if FolderExists(configPath) is true and FileExists(DNCLocation) is false then
+				do shell script cmdCurl
+				if FileExists(configPath & "/" & DNWorkflow) is true then
+					do shell script cmdUnzip
+					do shell script cmdCleanUp
+				end if
+			end if
+		on error
+			msg("Failed setting up", "", configPath)
+			return false
+		end try
+		if FileExists(DNCLocation) is true then
+			osXVersion()
+			if DisplayNoticeCenter is true then
+				msg("SSH-Check: Setup", configPath, "DNC is active!")
+				delay countdown
+			end if
+			return true
+		end if
+		return false
+	end if
+	return true
+end sshCheckSettings
+
 on run
 	resetProgram()
+	sshCheckSettings()
 	osXVersion() #comment this line if you don't have the display-notification-center-alert-automator-action installed
 	
 	set titlemsg to "SSH Service is Down!"
 	if isAppRunning() is equal to true and serviceAlive() is equal to 0 then
 		set message to "It is not safe to run " & program & ". Force it to quit by pressing \"OK\"!"
-		msg(titlemsg, "Warning", message)
+		msg(titlemsg, "Warning " & service, message)
 		killRunningApp()
 		return #exit SSH-Check
 	else if serviceAlive() is equal to 0 then
-		msg(titlemsg, "Warning", "Don't run " & program & ", because there's no connection to " & service & ".")
+		msg(titlemsg, "Warning about " & service, "Don't run " & program & ", because there's no connection to " & service & ".")
 		return #exit SSH-Check
 	end if
 	
