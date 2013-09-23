@@ -68,16 +68,11 @@ on FileExists(theFile)
 end FileExists
 
 on FolderExists(theFolder)
-	--msg("folderexists - checking this place", "", theFolder)
-	try
-		tell application "System Events"
-			if exists folder theFolder then
-				return true
-			end if
-		end tell
-	on error
-		return false
-	end try
+	tell application "System Events"
+		if exists folder theFolder then
+			return true
+		end if
+	end tell
 	return false
 end FolderExists
 
@@ -90,84 +85,9 @@ on osXVersion()
 	end if
 end osXVersion
 
-on notify(title, subtitle, message)
-	(* 	OS X 8+ make use of System Notifacation Center
- Requires: SETUP 
- 	1) automation workflow to be installed from http://www.automatedworkflows.com/2012/08/26/display-notification-center-alert-automator-action-1-0-0/
-	2) Create a new workflow in Automator containing only the Display Notification Center Alert action.
-	3) In the variables section at the bottom of the workflow construction area in Automator's window, create three variables named title, subtitle, and message.
-	4) Give message a default value like "Notification sent." You can leave the default values other two blank.
-	5) Drag each variable to its corresponding field in the Display Notification Center Alert action.
-	6) Save the workflow as Display Notification.wflow. A good place to save it is in ~/.ssh-check (create the folder if necessary).
-
-	Now you can display a notification from the command line using the following command:
-		automator -D title='Title text' -D subtitle='Subtitle text' -D message='Message text' '~/.ssh-check/Display Notification.wflow'  
- *)
-	
-	if title as text is not "" then set title to " -D title=" & quoted form of (title as text)
-	if subtitle as text is not "" then set subtitle to " -D subtitle=" & quoted form of (subtitle as text)
-	if message as text is not "" then set message to " -D message=" & quoted form of (message as text)
-	try
-		do shell script "automator" & space & title & space & subtitle & space & message & space & DNCLocation & space & "2>/dev/null"
-	on error
-		set DisplayNoticeCenter to "false"
-		msg("SSH-Check: Error", "", "Unable to comminucate with the Notifacation Center automator workflow action: " & DNCLocation)
-	end try
-end notify
-
-on isAppRunning()
-	try
-		tell application program
-			if it is running then
-				return true
-			end if
-		end tell
-	on error
-		return false
-	end try
-	return false
-end isAppRunning
-
-on killRunningApp()
-	try
-		tell application program -- doesn't automatically launch app
-			if it is running then
-				quit
-			end if
-		end tell
-	on error
-		do shell script "ps x | grep " & program & ".app | grep -v grep | awk '{print $1}' | xargs kill -9"
-	end try
-end killRunningApp
-
-on msg(title, subtitle, message)
-	if DisplayNoticeCenter is equal to true then -- use OS X Noticafaction Center
-		notify(title, subtitle, message)
-	else
-		try
-			return display dialog message with title title
-		on error
-			return
-		end try
-	end if
-end msg
-
-on serviceAlive()
-	try #check for ssh connected to defined service
-		set cmdSSH to "ps x | grep -i ssh | grep '.*@.*" & service & "' | awk '{print $8}'"
-		set sshcon to item 2 of paragraphs of (do shell script cmdSSH)
-		copy sshcon to tunnel
-		if tunnel contains service then
-			return tunnel
-		else
-			return 0
-		end if
-	on error
-		return 0
-	end try
-end serviceAlive
-
 on sshCheckSettings() #return bool
+	#Check to see if ~/.ssh-check and DNCLocation exists, and if not, then it installs them
+	#Note: installing DNCA automaticly just does not seem to work, yet, so the user has to download and install it
 	set configFolder to ".ssh-check"
 	set configPath to "~/" & configFolder
 	
@@ -177,17 +97,17 @@ on sshCheckSettings() #return bool
 	end if
 	
 	if FolderExists(configPath) is false or FileExists(DNCLocation) is false then
+		## Note: curling for now, but might start stuffing the workflow folder inside SSH-Check binary to remove a point of failure 
 		set cmdMakePath to "mkdir -p" & space & configPath
 		set mypath to "cd " & configPath & " && "
 		set DNWorkflow to "dn.workflow.zip"
-		# culr command: curl -L -o foobar.zip "https://github.com/xeoron/SSH-Check/blob/master/install/Display_Notification.workflow.zip?raw=true"
 		set cmdCurl to mypath & "curl -L -o " & DNWorkflow & space & quoted form of "https://github.com/xeoron/SSH-Check/blob/master/install/Display_Notification.workflow.zip?raw=true"
 		set cmdUnzip to mypath & "unzip -u dn.workflow.zip"
 		set cmdCleanUp to mypath & "rm -rf __MACOSX/" & space & DNWorkflow
 		#msg("cmdmakepath:", "", cmdMakePath)
 		#msg("cmdCurl:", "", cmdCurl)
 		#msg("cmdUnzip", "", cmdUnzip)
-		#msg("cmdCleanup", "", cmdCleanUp)
+		#msg("cmdCleanup", "", cmdCleanUp)	
 		
 		try
 			if FolderExists(configPath) is false then
@@ -217,6 +137,83 @@ on sshCheckSettings() #return bool
 	end if
 	return true
 end sshCheckSettings
+
+on notify(title, subtitle, message)
+	(* 	OS X 8+ make use of System Notifacation Center
+ Requires: SETUP 
+ 	1) automation workflow to be installed from http://www.automatedworkflows.com/2012/08/26/display-notification-center-alert-automator-action-1-0-0/
+	2) Create a new workflow in Automator containing only the Display Notification Center Alert action.
+	3) In the variables section at the bottom of the workflow construction area in Automator's window, create three variables named title, subtitle, and message.
+	4) Give message a default value like "Notification sent." You can leave the default values other two blank.
+	5) Drag each variable to its corresponding field in the Display Notification Center Alert action.
+	6) Save the workflow as Display_Notification.workflow. A good place to save it is in ~/.ssh-check (create the folder if necessary).
+
+	Now you can display a notification from the command line using the following command:
+		automator -D title='Title text' -D subtitle='Subtitle text' -D message='Message text' ~/.ssh-check/Display_Notification.workflow
+ *)
+	
+	if title as text is not "" then set title to " -D title=" & quoted form of (title as text)
+	if subtitle as text is not "" then set subtitle to " -D subtitle=" & quoted form of (subtitle as text)
+	if message as text is not "" then set message to " -D message=" & quoted form of (message as text)
+	try
+		do shell script "automator" & space & title & space & subtitle & space & message & space & DNCLocation & space & "2>/dev/null"
+	on error
+		set DisplayNoticeCenter to "false"
+		msg("SSH-Check: Error", "", "Unable to comminucate with the Notifacation Center automator workflow action: " & DNCLocation)
+	end try
+end notify
+
+on msg(title, subtitle, message)
+	if DisplayNoticeCenter is equal to true then -- use OS X Noticafaction Center
+		notify(title, subtitle, message)
+	else
+		try
+			return display dialog message with title title
+		on error
+			return
+		end try
+	end if
+end msg
+
+on isAppRunning()
+	try
+		tell application program
+			if it is running then
+				return true
+			end if
+		end tell
+	on error
+		return false
+	end try
+	return false
+end isAppRunning
+
+on killRunningApp()
+	try
+		tell application program -- doesn't automatically launch app
+			if it is running then
+				quit
+			end if
+		end tell
+	on error
+		do shell script "ps x | grep " & program & ".app | grep -v grep | awk '{print $1}' | xargs kill -9"
+	end try
+end killRunningApp
+
+on serviceAlive()
+	try #check for ssh connected to defined service
+		set cmdSSH to "ps x | grep -i ssh | grep '.*@.*" & service & "' | awk '{print $8}'"
+		set sshcon to item 2 of paragraphs of (do shell script cmdSSH)
+		copy sshcon to tunnel
+		if tunnel contains service then
+			return tunnel
+		else
+			return 0
+		end if
+	on error
+		return 0
+	end try
+end serviceAlive
 
 on run
 	resetProgram()
