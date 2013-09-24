@@ -5,7 +5,7 @@
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
-	Purpose: Only start a bitTorrent app if the system is signed into a SSH service.
+	Purpose: Only start a app if the system is signed into a SSH service.
 	
 	Default program is Firefox and ssh service tunnelr.com and
 	To reprogram what program you want to launch by default, 
