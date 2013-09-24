@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.5.5
+	Version: 0.5.6
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -56,7 +56,6 @@ on resetProgram()
 		copy programBackup to program
 	end if
 	set DisplayNoticeCenter to false
-	
 end resetProgram
 
 on getOSXNumber()
@@ -132,12 +131,10 @@ on sshCheckSettings() #return bool
 			msg("Failed setting up", "", configPath)
 			return false
 		end try
-		if FileExists(DNCLocation) is true then
-			setDisplay()
-			if DisplayNoticeCenter is true then
-				msg("SSH-Check: Setup", configPath, "DNC is active!")
-				delay countdown
-			end if
+		setDisplay()
+		if DisplayNoticeCenter is true then
+			msg("SSH-Check: Setup", configPath, "DNC is active!")
+			delay countdown
 			return true
 		end if
 		return false
