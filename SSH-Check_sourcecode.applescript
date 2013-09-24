@@ -105,10 +105,10 @@ on sshCheckSettings() #return bool
 	if FolderExists(configPath) is false or FileExists(DNCLocation) is false then
 		## Note: curling for now, but might start stuffing the workflow folder inside SSH-Check binary to remove a point of failure 
 		set cmdMakePath to "mkdir -p" & space & configPath
-		set mypath to "cd " & configPath & " && "
+		set mypath to "cd " & configPath & space & "&&" & space
 		set DNWorkflow to "dn.workflow.zip"
 		set cmdCurl to mypath & "curl -L -o " & DNWorkflow & space & quoted form of "https://github.com/xeoron/SSH-Check/blob/master/install/Display_Notification.workflow.zip?raw=true"
-		set cmdUnzip to mypath & "unzip -u dn.workflow.zip"
+		set cmdUnzip to mypath & "unzip -u" & space & DNWorkflow
 		set cmdCleanUp to mypath & "rm -rf __MACOSX/" & space & DNWorkflow
 		#msg("cmdmakepath:", "", cmdMakePath)
 		#msg("cmdCurl:", "", cmdCurl)
