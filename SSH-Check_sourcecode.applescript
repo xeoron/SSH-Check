@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.5.4
+	Version: 0.5.5
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -43,7 +43,7 @@ on open these_items
 	set prog to text item 1 of prog
 	copy prog to program
 	
-	osXVersion()
+	setDisplay()
 	msg("SSH-ChecK", "Setting " & program, "Now set to startup " & program)
 	delay countdown
 	run
@@ -56,7 +56,21 @@ on resetProgram()
 		copy programBackup to program
 	end if
 	set DisplayNoticeCenter to false
+	
 end resetProgram
+
+on getOSXNumber()
+	set text item delimiters to "."
+	return ((text item 2 of (system version of (system info))) as number)
+end getOSXNumber
+
+on setDisplay()
+	if getOSXNumber() ³ 8 and FileExists(DNCLocation) is equal to true and FileExists(DNCA) is true then
+		set DisplayNoticeCenter to true
+	else
+		set DisplayNoticeCenter to false
+	end if
+end setDisplay
 
 on FileExists(theFile)
 	tell application "System Events"
@@ -76,25 +90,18 @@ on FolderExists(theFolder)
 	return false
 end FolderExists
 
-on osXVersion()
-	set text item delimiters to "."
-	if FileExists(DNCLocation) is equal to true and FileExists(DNCA) is true and ((text item 2 of (system version of (system info))) as number) ³ 8 then
-		set DisplayNoticeCenter to true
-	else
-		set DisplayNoticeCenter to false
-	end if
-end osXVersion
-
 on sshCheckSettings() #return bool
 	#Check to see if ~/.ssh-check and DNCLocation exists, and if not, then it installs them
 	#Note: installing DNCA automaticly just does not seem to work, yet, so the user has to download and install it
-	set configFolder to ".ssh-check"
-	set configPath to "~/" & configFolder
-	
-	if FileExists(DNCA) is false and ((text item 2 of (system version of (system info))) as number) ³ 8 then
+	if (getOSXNumber() < 8) then # OSX.7 Lion: or lower
+		return fslse
+	else if FileExists(DNCA) is false and getOSXNumber() ³ 8 then
 		msg(DNCA, "", "automator notification is not installed. Get a copy here: http://www.automatedworkflows.com/2012/08/26/display-notification-center-alert-automator-action-1-0-0/")
 		return false
 	end if
+	
+	set configFolder to ".ssh-check"
+	set configPath to "~/" & configFolder
 	
 	if FolderExists(configPath) is false or FileExists(DNCLocation) is false then
 		## Note: curling for now, but might start stuffing the workflow folder inside SSH-Check binary to remove a point of failure 
@@ -126,7 +133,7 @@ on sshCheckSettings() #return bool
 			return false
 		end try
 		if FileExists(DNCLocation) is true then
-			osXVersion()
+			setDisplay()
 			if DisplayNoticeCenter is true then
 				msg("SSH-Check: Setup", configPath, "DNC is active!")
 				delay countdown
@@ -218,7 +225,7 @@ end serviceAlive
 on run
 	resetProgram()
 	sshCheckSettings()
-	osXVersion() #comment this line if you don't have the display-notification-center-alert-automator-action installed
+	setDisplay()
 	
 	set titlemsg to "SSH Service is Down!"
 	if isAppRunning() is equal to true and serviceAlive() is equal to 0 then
