@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.5.6
+	Version: 0.5.7
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -167,12 +167,12 @@ on notify(title, subtitle, message)
 	end try
 end notify
 
-on msg(title, subtitle, message)
+on msg(msgTitle, subtitle, message)
 	if DisplayNoticeCenter is equal to true then -- use OS X Noticafaction Center
-		notify(title, subtitle, message)
+		notify(msgTitle, subtitle, message)
 	else
 		try
-			return display dialog message with title title
+			return display dialog message with title msgTitle
 		on error
 			return
 		end try
