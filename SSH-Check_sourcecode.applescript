@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.5.7
+	Version: 0.5.8
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -93,7 +93,7 @@ on sshCheckSettings() #return bool
 	#Check to see if ~/.ssh-check and DNCLocation exists, and if not, then it installs them
 	#Note: installing DNCA automaticly just does not seem to work, yet, so the user has to download and install it
 	if (getOSXNumber() < 8) then # OSX.7 Lion: or lower
-		return fslse
+		return false
 	else if FileExists(DNCA) is false and getOSXNumber() ³ 8 then
 		msg(DNCA, "", "automator notification is not installed. Get a copy here: http://www.automatedworkflows.com/2012/08/26/display-notification-center-alert-automator-action-1-0-0/")
 		return false
