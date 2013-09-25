@@ -9,7 +9,7 @@ Purpose:
 Why is this useful?
 Sometimes you don't realize that the SSH connection has timed-out or dropped for any number of other reasons, which is important if you want to ensure your SOCK Proxy is running before running your web-browser, use your network file-manager or secure your IM , or even bit-torrent program.
 
-It will launch the pre-set program, only if there is a SSH connection to tunnelr.com (this can be changed) after waiting 6 seconds to cancel the start up request. But, if the program is already running, then it will ask to restart it or force it to stop running or do nothing. And, if there is no SSH connection while the program is running, then it will force the program exit.
+It will launch the pre-set program, only if there is a SSH connection to tunnelr.com (this can be changed in the sourcecode). When the program is already running, then it will ask to restart it or force it to stop running or do nothing. And, if there is no SSH connection while the program is running, then it will force the program exit.
 
 Program Defaults
 ======
