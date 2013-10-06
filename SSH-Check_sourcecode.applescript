@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.5.8
+	Version: 0.6.0
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -20,9 +20,11 @@
 property service : "tunnelr.com"
 property program : "Firefox"
 property programBackup : "Firefox" #don't remove to overt droplet bug
+property serviceBackup : "tunnelr.com"
 
 property countdown : "6" #time out in seconds
 property DNCLocation : "~/.ssh-check/Display_Notification.workflow"
+property XMLSettings : "~/.ssh-check/iconfigSSHC.py"
 property DNCA : "~/Library/Automator/Display Notification Center Alert.action"
 property DisplayNoticeCenter : false #script switchings to true when running on OS X.8 or higher & if "DNCLocation & DNCA" exists
 
@@ -41,6 +43,8 @@ on open these_items
 	set prog to text item 3 of prog
 	set text item delimiters to "."
 	set prog to text item 1 of prog
+	sshCheckSettings()
+	updateXML(prog)
 	copy prog to program
 	
 	setDisplay()
@@ -51,10 +55,6 @@ end open
 
 on resetProgram()
 	#fix empty list and stops droplet bug
-	
-	if program is "" then
-		copy programBackup to program
-	end if
 	set DisplayNoticeCenter to false
 end resetProgram
 
@@ -89,20 +89,65 @@ on FolderExists(theFolder)
 	return false
 end FolderExists
 
-on sshCheckSettings() #return bool
-	#Check to see if ~/.ssh-check and DNCLocation exists, and if not, then it installs them
-	#Note: installing DNCA automaticly just does not seem to work, yet, so the user has to download and install it
-	if (getOSXNumber() < 8) then # OSX.7 Lion: or lower
-		return false
-	else if FileExists(DNCA) is false and getOSXNumber() ³ 8 then
-		msg(DNCA, "", "automator notification is not installed. Get a copy here: http://www.automatedworkflows.com/2012/08/26/display-notification-center-alert-automator-action-1-0-0/")
-		return false
+on updateXML(programName)
+	if FileExists(XMLSettings) is true then
+		try
+			set update to do shell script XMLSettings & space & "-up" & space & quoted form of programName
+			if update is "True" then
+				return true
+			else
+				set update to do shell script XMLSettings & space & "-c" & space & quoted form of programName
+				set update2 to do shell script XMLSettings & space & "-up" & space & quoted form of programName
+				if update is "True" and update2 is "True" then
+					return true
+				end if
+			end if
+			error
+		end try
 	end if
-	
+	return false
+end updateXML
+
+on setUpService()
+	if FileExists(XMLSettings) is true then
+		try
+			set ser to do shell script XMLSettings & space & "-s"
+			if ser does not contain "None" and ser does not contain "" then
+				copy ser to service
+				return true
+			end if
+			error
+		end try
+	end if
+	if service is "" then
+		copy serviceBackup to service
+	end if
+	return false
+end setUpService
+
+on setUpProgram()
+	if FileExists(XMLSettings) is true then
+		try
+			set prog to do shell script XMLSettings & space & "-p"
+			if prog does not contain "None" and prog does not contain "" then
+				copy prog to program
+				return true
+			end if
+			error
+		end try
+	end if
+	if program is "" then
+		copy programBackup to program
+	end if
+	return false
+end setUpProgram
+
+on sshCheckSettings() #return bool
 	set configFolder to ".ssh-check"
 	set configPath to "~/" & configFolder
 	
-	if FolderExists(configPath) is false or FileExists(DNCLocation) is false then
+	if FolderExists(configPath) is false or FileExists(DNCLocation) is false or FileExists(XMLSettings) is false then
+		## setup path, display notification data, and config file manager
 		## Note: curling for now, but might start stuffing the workflow folder inside SSH-Check binary to remove a point of failure 
 		set cmdMakePath to "mkdir -p" & space & configPath
 		set mypath to "cd " & configPath & space & "&&" & space
@@ -110,36 +155,55 @@ on sshCheckSettings() #return bool
 		set cmdCurl to mypath & "curl -L -o " & DNWorkflow & space & quoted form of "https://github.com/xeoron/SSH-Check/blob/master/install/Display_Notification.workflow.zip?raw=true"
 		set cmdUnzip to mypath & "unzip -u" & space & DNWorkflow
 		set cmdCleanUp to mypath & "rm -rf __MACOSX/" & space & DNWorkflow
+		set cmdCurlXML to mypath & "curl -L -o " & XMLSettings & space & quoted form of "https://github.com/xeoron/SSH-Check/blob/master/install/iconfigSSHC.py?raw=true"
+		
 		#msg("cmdmakepath:", "", cmdMakePath)
 		#msg("cmdCurl:", "", cmdCurl)
 		#msg("cmdUnzip", "", cmdUnzip)
-		#msg("cmdCleanup", "", cmdCleanUp)	
+		#msg("cmdCleanup", "", cmdCleanUp)
 		
 		try
 			if FolderExists(configPath) is false then
-				do shell script cmdMakePath
+				do shell script cmdMakePath #create path
 			end if
 			
 			if FolderExists(configPath) is true and FileExists(DNCLocation) is false then
+				#setup display notification center workflow
 				do shell script cmdCurl
 				if FileExists(configPath & "/" & DNWorkflow) is true then
 					do shell script cmdUnzip
 					do shell script cmdCleanUp
 				end if
 			end if
+			
+			if FileExists(XMLSettings) is false then
+				do shell script cmdCurlXML #setup config file
+			end if
 		on error
 			msg("Failed setting up", "", configPath)
+			setUpService()
+			setUpProgram()
 			return false
 		end try
+		
+		#re-check display settings to see if DNC is working now.
 		setDisplay()
-		if DisplayNoticeCenter is true then
+		#Check to see if ~/.ssh-check and DNCLocation exists, and if not, then it installs them
+		#Note: installing DNCA automaticly just does not seem to work, yet, so the user has to download and install it
+		if FileExists(DNCA) is false and getOSXNumber() ³ 8 then
+			msg(DNCA, "", "automator notification is not installed. Get a copy here: http://www.automatedworkflows.com/2012/08/26/display-notification-center-alert-automator-action-1-0-0/")
+		else if FolderExists(configPath) is true and FileExists(DNCLocation) is true and FileExists(XMLSettings) is true and DisplayNoticeCenter is true then
 			msg("SSH-Check: Setup", configPath, "DNC is active!")
 			delay countdown
-			return true
 		end if
-		return false
 	end if
-	return true
+	
+	#loadSettings from config file
+	if setUpService() is true and setUpProgram() is true then
+		return true
+	end if
+	
+	return false
 end sshCheckSettings
 
 on notify(title, subtitle, message)
@@ -194,7 +258,7 @@ end isAppRunning
 
 on killRunningApp()
 	try
-		tell application program -- doesn't automatically launch app
+		tell application program -- doesn't launch app
 			if it is running then
 				quit
 			end if
@@ -224,19 +288,20 @@ on run
 	sshCheckSettings()
 	setDisplay()
 	
+	set isServiceAlive to serviceAlive()
 	set titlemsg to "SSH Service is Down!"
-	if isAppRunning() is equal to true and serviceAlive() is equal to 0 then
+	if isAppRunning() is equal to true and isServiceAlive is equal to 0 then
 		set message to "It is not safe to run " & program & ". Force it to quit by pressing \"OK\"!"
 		msg(titlemsg, "Warning " & service, message)
 		killRunningApp()
 		return #exit SSH-Check
-	else if serviceAlive() is equal to 0 then
+	else if isServiceAlive is equal to 0 then
 		msg(titlemsg, "Warning about " & service, "Don't run " & program & ", because there's no connection to " & service & ".")
 		return #exit SSH-Check
 	end if
 	
 	#Ask if you want to run your program, kill it, or quietly stop
-	set titlemsg to "Active SSH Connection to: " & serviceAlive()
+	set titlemsg to "Active SSH Connection to: " & isServiceAlive
 	if isAppRunning() is equal to true then # should we kill & restart the running app?
 		set btnOpt to {"Restart", "Exit SSH-Check", "Turn Off"}
 		set qMsg to program & " is running! Do you want to: Restart It, Turn it Off, or Exit SSH-Check"
