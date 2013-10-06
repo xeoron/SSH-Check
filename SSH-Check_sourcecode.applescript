@@ -173,6 +173,7 @@ on sshCheckSettings() #return bool
 					set yesOrNo to button returned of (display dialog qMsg buttons btnOpt default button "No" with title "SSH-Check Setup Needs Your Help" giving up after countdown * 60)
 					if yesOrNo is "Yes" then
 						do shell script "open " & configPath & quoted form of "Display Notification Center Alert.action"
+						msg("If Automator started up", "success! Now", "please close it!")
 					end if
 				end try
 			end if
