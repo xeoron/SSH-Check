@@ -20,12 +20,12 @@ By default SSH-Check has these settings
 	program : "Firefox"
 	service : "tunnelr.com"
 
-When you run the program for the first time, it will setup several things, including a ~/.ssh-check folder. There you will find data settings stored in a xml file, a xml manager called "iconfigSSHC.py", and Display Notification Center workflow data file. 
+When you run the program for the first time, it will setup several things, including a ~/.ssh-check folder where you will find a settings manager called "iconfigSSHC.py".
 To update the settings, at the command-line, use the following commands:
 
 	cd ~/.ssh-check
-	iconfigSSHC.py -help      <-- program options
-	iconfigSSHC.py -up "vlc"  <-- update program name
+	iconfigSSHC.py -help              <-- program options
+	iconfigSSHC.py -up "vlc"          <-- update program name
 	iconfigSSHC.py -us "192.168.1.5"  <-- update service name
 
 Requirements
@@ -38,12 +38,15 @@ For NoneDisruptive Messages on OS X.8 (Mountain Lion) or higher the following is
 	   Display Notification Centert Alert Automator Action script.
 	2) Display_Notification.workflow 
 
-SSH-Check auto-installs Display_Notification.workflow in ~/.ssh-check for you, but requires you to manually download and install Ben Waldie's Automator script here:
+SSH-Check auto-installs following support files in the folder ~/.ssh-check
 
- 	http://www.automatedworkflows.com/2012/08/26/display-notification-center-alert-automator-action-1-0-0/	
+	Display_Notification.workflow
+	iconfigSSHC.py  
+	config.xml
 
+It will also ask for permission to install Ben Waldie's Display Notification Centert Alert Automator Action script
 
-Note: you can display a notification from the command line using the following command:
+Note: with all of the support files setup, you can display a notification from the command line using the following command:
 
 	automator -D title='Title text' -D subtitle='Subtitle text' -D message='Message text' ~/.ssh-check/Display_Notification.workflow
   
