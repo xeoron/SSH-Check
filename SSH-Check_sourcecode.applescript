@@ -167,7 +167,7 @@ on sshCheckSettings() #return bool
 					set cmdCleanUpAlertAction to mypath & "rm -rf __MACOSX/" & space & alertAction
 					do shell script cmdCleanUpAlertAction
 				end if
-				set qMsg to "SSH-Check would like to setup Automator notification center. To setup, press 'Yes'"
+				set qMsg to "SSH-Check would like to setup Automator Notification Center. Press 'Yes' to setup and 'No' to skip!"
 				set btnOpt to {"Yes", "No"}
 				try
 					set yesOrNo to button returned of (display dialog qMsg buttons btnOpt default button "No" with title titlemsg giving up after countdown * 60)
