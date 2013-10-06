@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.6.2
+	Version: 0.6.3
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -157,7 +157,7 @@ on sshCheckSettings() #return bool
 				do shell script cmdMakePath #create path
 			end if
 			
-			if FileExists(DNCA) is false then
+			if FileExists(DNCA) is false and getOSXNumber() ³ 8 then
 				set alertAction to "Display_Notification_Center_Alert.action.zip"
 				set cmdCurlDNCA to mypath & "curl -L -o " & alertAction & space & quoted form of "https://github.com/xeoron/SSH-Check/blob/master/install/Display_Notification_Center_Alert.action.zip?raw=true"
 				do shell script cmdCurlDNCA
@@ -205,10 +205,7 @@ on sshCheckSettings() #return bool
 		setDisplay()
 		#Check to see if ~/.ssh-check and DNCLocation exists, and if not, then it installs them
 		#Note: installing DNCA automaticly just does not seem to work, yet, so the user has to download and install it
-		if FileExists(DNCA) is false and getOSXNumber() ³ 8 then
-			msg(DNCA, "", "automator notification is not installed. Get a copy here: http://www.automatedworkflows.com/2012/08/26/display-notification-center-alert-automator-action-1-0-0/")
-			#do shell script "open " & configPath
-		else if FolderExists(configPath) is true and FileExists(DNCLocation) is true and FileExists(XMLSettings) is true and DisplayNoticeCenter is true then
+		if FileExists(DNCA) is true and getOSXNumber() ³ 8 and FolderExists(configPath) is true and FileExists(DNCLocation) is true and FileExists(XMLSettings) is true and DisplayNoticeCenter is true then
 			msg("SSH-Check: Setup", configPath, "DNC is active!")
 			delay countdown
 		end if
