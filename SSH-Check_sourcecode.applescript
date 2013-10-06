@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.6.1
+	Version: 0.6.2
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -170,7 +170,7 @@ on sshCheckSettings() #return bool
 				set qMsg to "SSH-Check would like to setup Automator Notification Center. Press 'Yes' to setup and 'No' to skip!"
 				set btnOpt to {"Yes", "No"}
 				try
-					set yesOrNo to button returned of (display dialog qMsg buttons btnOpt default button "No" with title titlemsg giving up after countdown * 60)
+					set yesOrNo to button returned of (display dialog qMsg buttons btnOpt default button "No" with title "SSH-Check Setup Needs Your Help" giving up after countdown * 60)
 					if yesOrNo is "Yes" then
 						do shell script "open " & configPath & quoted form of "Display Notification Center Alert.action"
 					end if
