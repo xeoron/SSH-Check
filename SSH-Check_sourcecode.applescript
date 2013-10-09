@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.6.3
+	Version: 0.6.4
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -146,7 +146,7 @@ on sshCheckSettings() #return bool
 	set configFolder to ".ssh-check"
 	set configPath to "~/" & configFolder
 	
-	if FolderExists(configPath) is false or FileExists(DNCLocation) is false or FileExists(XMLSettings) is false then
+	if FolderExists(configPath) is false or FileExists(DNCLocation) is false or FileExists(XMLSettings) is false or (FileExists(DNCA) is false and getOSXNumber() ³ 8) then
 		## setup path, display notification data, and config file manager
 		## Note: curling for now, but might start stuffing the workflow folder inside SSH-Check binary to remove a point of failure 
 		set mypath to "cd " & configPath & space & "&&" & space
@@ -155,6 +155,13 @@ on sshCheckSettings() #return bool
 			if FolderExists(configPath) is false then
 				set cmdMakePath to "mkdir -p" & space & configPath
 				do shell script cmdMakePath #create path
+			end if
+			
+			if FileExists(XMLSettings) is false then
+				set cmdCurlXML to mypath & "curl -L -o " & XMLSettings & space & quoted form of "https://github.com/xeoron/SSH-Check/blob/master/install/iconfigSSHC.py?raw=true"
+				do shell script cmdCurlXML #get config file manager
+				do shell script mypath & "chmod +x" & space & XMLSettings #mark executable
+				#note: the first time XMLSettings (iconfigSSHC.py) is asked for data it will generate config.xml, then all other times it will use the data set in the file.
 			end if
 			
 			if FileExists(DNCA) is false and getOSXNumber() ³ 8 then
@@ -172,9 +179,10 @@ on sshCheckSettings() #return bool
 				try
 					set yesOrNo to button returned of (display dialog qMsg buttons btnOpt default button "No" with title "SSH-Check Setup Needs Your Help" giving up after countdown * 60)
 					if yesOrNo is "Yes" then
-						do shell script "open " & configPath & quoted form of "Display Notification Center Alert.action"
-						msg("If Automator started up", "success! Now", "please close it!")
+						do shell script mypath & "open " & quoted form of "Display Notification Center Alert.action"
 					end if
+					error
+					msg("SSH-Check: Error", "", "Failed to install action script!")
 				end try
 			end if
 			
@@ -187,27 +195,23 @@ on sshCheckSettings() #return bool
 				do shell script cmdCurlDNWorkflow
 				if FileExists(configPath & "/" & DNWorkflow) is true then
 					do shell script cmdUnzipDNWorkflow
-					do shell script cmdCleanUp
+					do shell script cmdCleanUpDNWorkflow
 				end if
 			end if
-			
-			if FileExists(XMLSettings) is false then
-				set cmdCurlXML to mypath & "curl -L -o " & XMLSettings & space & quoted form of "https://github.com/xeoron/SSH-Check/blob/master/install/iconfigSSHC.py?raw=true"
-				do shell script cmdCurlXML #setup config file
-			end if
 		on error
-			msg("Failed setting up", "", configPath)
+			msg("Failed:" & imsg, "", configPath)
 			setUpService()
 			setUpProgram()
 			return false
 		end try
 		
 		#re-check display settings to see if DNC is working now.
-		setDisplay()
+		
 		#Check to see if ~/.ssh-check and DNCLocation exists, and if not, then it installs them
 		#Note: installing DNCA automaticly just does not seem to work, yet, so the user has to download and install it
+		setDisplay()
 		if FileExists(DNCA) is true and getOSXNumber() ³ 8 and FolderExists(configPath) is true and FileExists(DNCLocation) is true and FileExists(XMLSettings) is true and DisplayNoticeCenter is true then
-			msg("SSH-Check: Setup", configPath, "DNC is active!")
+			msg("SSH-Check: Setup", configPath & " settings are current.", "Display Notification Center Is Active!")
 			delay countdown
 		end if
 	end if
