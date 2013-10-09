@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.6.4
+	Version: 0.6.5
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -205,14 +205,12 @@ on sshCheckSettings() #return bool
 			return false
 		end try
 		
-		#re-check display settings to see if DNC is working now.
-		
-		#Check to see if ~/.ssh-check and DNCLocation exists, and if not, then it installs them
-		#Note: installing DNCA automaticly just does not seem to work, yet, so the user has to download and install it
+		#re-check display settings to see if DNC is working now, but first pause to allow finder time to refresh.
+		delay countdown / 3
 		setDisplay()
-		if FileExists(DNCA) is true and getOSXNumber() ³ 8 and FolderExists(configPath) is true and FileExists(DNCLocation) is true and FileExists(XMLSettings) is true and DisplayNoticeCenter is true then
+		if DisplayNoticeCenter is true then
 			msg("SSH-Check: Setup", configPath & " settings are current.", "Display Notification Center Is Active!")
-			delay countdown
+			delay countdown / 3
 		end if
 	end if
 	
