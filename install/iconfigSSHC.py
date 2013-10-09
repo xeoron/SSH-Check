@@ -1,7 +1,7 @@
 #!/usr/bin/python
 __author__ = 'Jason Campisi'
 # Program: iconfigSSHC.py 
-# Version: 0.1.0
+# Version: 0.1.2
 # Author: Jason Campisi
 # Date: 9.29.13
 # License: GPL 2 or higher
@@ -127,19 +127,24 @@ def main():
   except IOError as err:
 		print "None"
 		sys.exit(2)
-
-  if _args.update_service != None:
+  try:
+    if _args.update_service != None:
   		print updateService(_args.update_service, file)
-  elif _args.update_program != None:
+    elif _args.update_program != None:
 		print updateProgram(_args.update_program, file)
-  elif _args.create:
+    elif _args.create:
   		print createXMLFile(file)
-  elif _args.service:
-		print getService(ET.parse(file).getroot())
-  elif _args.program:
+    elif _args.service:
+ 		print getService(ET.parse(file).getroot())
+    elif _args.program:
 		print getProgram(ET.parse(file).getroot())		
-  else:
+    else:
 		print "None"
+  except ET.ParseError, v:
+    print "Error: rebuilding config.xml file...", createXMLFile(file) 
+    #row, column = v.position
+    #print "XML Error: error on row", row, "column", column, ":", v
+
 		
   sys.exit()
 
