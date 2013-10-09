@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.6.5
+	Version: 0.6.6
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -210,7 +210,7 @@ on sshCheckSettings() #return bool
 		setDisplay()
 		if DisplayNoticeCenter is true then
 			msg("SSH-Check: Setup", configPath & " settings are current.", "Display Notification Center Is Active!")
-			delay countdown / 3
+			delay 1
 		end if
 	end if
 	
@@ -333,8 +333,8 @@ on run
 	else
 		set qMsg to "Starting " & program
 		if DisplayNoticeCenter is equal to true then
-			msg("SSH-Check", serviceAlive(), qMsg & " in " & (countdown / 2) & " seconds!")
-			delay (countdown / 2)
+			msg("SSH-Check", serviceAlive() & space & "is active", qMsg & "up now!")
+			delay (countdown / 3)
 		else
 			set btnOpt to {"Launch", "Stop"}
 			try
