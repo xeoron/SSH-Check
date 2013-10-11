@@ -24,9 +24,9 @@ When you run the program for the first time, it will setup several things, inclu
 To update the settings, at the command-line, use the following commands:
 
 	cd ~/.ssh-check
-	iconfigSSHC.py -h                 <-- program options
-	iconfigSSHC.py -up "vlc"          <-- update program name
-	iconfigSSHC.py -us "192.168.1.5"  <-- update service name
+	./iconfigSSHC.py -h                 <-- program options
+	./iconfigSSHC.py -up "vlc"          <-- update program name
+	./iconfigSSHC.py -us "192.168.1.5"  <-- update service name
 
 Requirements
 =====
