@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.6.6
+	Version: 0.7.0
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -150,24 +150,31 @@ on sshCheckSettings() #return bool
 		## setup path, display notification data, and config file manager
 		## Note: curling for now, but might start stuffing the workflow folder inside SSH-Check binary to remove a point of failure 
 		set mypath to "cd " & configPath & space & "&&" & space
+		set supportLoc to (POSIX path of (path to me as string)) & "Contents/Support/"
 		
 		try
 			if FolderExists(configPath) is false then
 				set cmdMakePath to "mkdir -p" & space & configPath
 				do shell script cmdMakePath #create path
+				delay 0.5 #note: FileExist will fail, even if true, if the program does not pause first
 			end if
 			
 			if FileExists(XMLSettings) is false then
-				set cmdCurlXML to mypath & "curl -L -o " & XMLSettings & space & quoted form of "https://github.com/xeoron/SSH-Check/blob/master/install/iconfigSSHC.py?raw=true"
-				do shell script cmdCurlXML #get config file manager
-				do shell script mypath & "chmod +x" & space & XMLSettings #mark executable
-				#note: the first time XMLSettings (iconfigSSHC.py) is asked for data it will generate config.xml, then all other times it will use the data set in the file.
+				#note: the first time XMLSettings (iconfigSSHC.py) is asked for data it will generate config.xml, 
+				#then all other times it will use the data set in the file. And, if config.xml becomes corrupt, iconfigSSHC.py will replace it
+				try
+					do shell script mypath & "cp " & supportLoc & "iconfigSSHC.py ./"
+					do shell script mypath & "chmod +x" & space & XMLSettings
+				end try
+				delay 0.5
 			end if
 			
 			if FileExists(DNCA) is false and getOSXNumber() ³ 8 then
+				#setup Automator Display Notification Center Action script
 				set alertAction to "Display_Notification_Center_Alert.action.zip"
-				set cmdCurlDNCA to mypath & "curl -L -o " & alertAction & space & quoted form of "https://github.com/xeoron/SSH-Check/blob/master/install/Display_Notification_Center_Alert.action.zip?raw=true"
-				do shell script cmdCurlDNCA
+				do shell script mypath & "cp " & supportLoc & alertAction & space & "./"
+				delay 0.5
+				
 				if FileExists(configPath & "/" & alertAction) is true then
 					set cmdUnzipAlertAction to mypath & "unzip -u" & space & alertAction
 					do shell script cmdUnzipAlertAction
@@ -184,22 +191,24 @@ on sshCheckSettings() #return bool
 					error
 					msg("SSH-Check: Error", "", "Failed to install action script!")
 				end try
+				delay 0.5
 			end if
 			
 			if FolderExists(configPath) is true and FileExists(DNCLocation) is false then
 				#setup display notification center workflow
-				set DNWorkflow to "dn.workflow.zip"
-				set cmdCurlDNWorkflow to mypath & "curl -L -o " & DNWorkflow & space & quoted form of "https://github.com/xeoron/SSH-Check/blob/master/install/Display_Notification.workflow.zip?raw=true"
+				set DNWorkflow to "Display_Notification.workflow.zip"
 				set cmdUnzipDNWorkflow to mypath & "unzip -u" & space & DNWorkflow
 				set cmdCleanUpDNWorkflow to mypath & "rm -rf __MACOSX/" & space & DNWorkflow
-				do shell script cmdCurlDNWorkflow
+				do shell script mypath & "cp " & supportLoc & DNWorkflow & space & "./"
+				delay 0.5
+				
 				if FileExists(configPath & "/" & DNWorkflow) is true then
 					do shell script cmdUnzipDNWorkflow
 					do shell script cmdCleanUpDNWorkflow
 				end if
 			end if
 		on error
-			msg("Failed:" & imsg, "", configPath)
+			msg("Setup Failed:", "", configPath)
 			setUpService()
 			setUpProgram()
 			return false
