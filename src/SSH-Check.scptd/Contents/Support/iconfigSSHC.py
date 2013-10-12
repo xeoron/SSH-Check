@@ -1,7 +1,7 @@
 #!/usr/bin/python
 __author__ = 'Jason Campisi'
 # Program: iconfigSSHC.py 
-ver = "version 0.2"
+# Version: 0.1.2
 # Author: Jason Campisi
 # Date: 9.29.13
 # License: GPL 2 or higher
@@ -12,7 +12,6 @@ ver = "version 0.2"
 #     <settings name="sshcheck">
 #         <program>Firefox</program>
 #         <service>tunnelr.com</service>
-#         <localOrGlobal>local</logalOrGlobal>
 #     </settings>
 # </data>
 #
@@ -25,7 +24,6 @@ import argparse
 
 program = "Firefox"
 service = "tunnelr.com"
-localOrGlobal = "local"
 
 def getProgram(root):
 	"""Returns program name in xml file or returns None"""
@@ -38,14 +36,6 @@ def getService(root):
 	for settings in root.findall('settings'):
 		return settings.find('service').text
 	return "None"
-
-def getLocalOrGlobal(root):
-	"""Returns service level, where to either to search only if 
-	local user is running the service or if anyone is running it"""
-	for settings in root.findall('settings'):
-		return settings.find('localOrGlobal').text
-	return "None"
-
 
 def doesFolderExist(folder):
 	"""Does a folder exist? True/False"""
@@ -86,7 +76,6 @@ def createXMLFile(file):
 		f.write('     <settings name="sshcheck">\r\n')
 		f.write('         <program>' + program + '</program>\r\n')
 		f.write('         <service>' + service + '</service>\r\n')
-		f.write('         <localOrGlobal>' + localOrGlobal + '</localOrGlobal>\r\n')
 		f.write('     </settings>\r\n')
 		f.write(' </data>\r\n')
 		f.close()
@@ -113,19 +102,10 @@ def updateService(server, file):
 		pass
 	return False
 
-def updateGetLocalOrGlobal(proximity , file):
-	try:
-		global localOrGlobal 
-		localOrGlobal = proximity
-		return createXMLFile(file)
-	except Exception:
-		pass
-	return False
-
 def main():
   try:
 	 folder = "".join(['/Users/', getpass.getuser(), '/.ssh-check/'])
-	 file   = "".join(['/Users/', getpass.getuser(), '/.ssh-check/2config.xml'])
+	 file   = "".join(['/Users/', getpass.getuser(), '/.ssh-check/config.xml'])
 	 
 	 parser = argparse.ArgumentParser(
 	 	prog='iconfigSSHC.py',
@@ -133,13 +113,9 @@ def main():
 	 )
 	 parser.add_argument('-s','--service', help='Find the service name', action='store_true')
 	 parser.add_argument('-p','--program', help='Find program name', action='store_true')
-	 parser.add_argument('-r','--run', help='Running state proximity of a service. Is the local user running it or is it elsewhere on the system? There are 2 states, which are Local or Global', action='store_true')
 	 parser.add_argument('-c','--create', help='Create the xml file here: ~/.ssh-check/config.xml', action='store_true')
 	 parser.add_argument('-up','--update-program', help='Update the program name')
 	 parser.add_argument('-us','--update-service', help='Update the service name')
-	 parser.add_argument('-ur','--update-run', help='Update running service state "global" or "local"')
-	 parser.add_argument('-v','--version', action='version', version=ver)
-	 
 	 if len(sys.argv)==1:
 	 	parser.print_help()
 	 	sys.exit(1)
