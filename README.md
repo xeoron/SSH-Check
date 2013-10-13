@@ -19,15 +19,18 @@ By default SSH-Check has these settings
 
 	program : "Firefox"
 	service : "tunnelr.com"
+	service-level: "locally"
 
 When you run the program for the first time, it will setup several things, including a ~/.ssh-check folder where you will find a settings manager called "iconfigSSHC.py".
 To update the settings, at the command-line, use the following commands:
 
 	cd ~/.ssh-check
-	./iconfigSSHC.py -h                 <-- program options
 	./iconfigSSHC.py -up "vlc"          <-- update program name
 	./iconfigSSHC.py -us "192.168.1.5"  <-- update service name
-
+	./iconfigSSHC.py -rl				<-- running service must be only from local user
+	./iconfigSSHC.py -rg				<-- running service can be by any user
+	./iconfigSSHC.py -h                 <-- program options
+	
 Requirements
 =====
 Mac OS X Snow Leopard or higher

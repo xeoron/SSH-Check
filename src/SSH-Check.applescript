@@ -1,16 +1,18 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.7.0
+	Version: 0.7.1
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
 	Purpose: Only start a app if the system is signed into a SSH service.
 	
-	Default program is Firefox and ssh service tunnelr.com and
-	To reprogram what program you want to launch by default, 
-	drop a program onto SSH-Check.
-	
+	Default program is Firefox and ssh service tunnelr.com while
+	searching for the service run by the local user.
+	To reprogram what program you want to launch, then merely 
+	drop a program onto SSH-Check. 
+	To change other settings run at the cmdline: 
+		 ~/.ssh-check/iconfigSSHC.py
 	NOTE: 
 	For even more security this program is best combined with a cron job to 
 	check if SSH connection is still alive, otherwise kill your  App.
@@ -27,6 +29,7 @@ property DNCLocation : "~/.ssh-check/Display_Notification.workflow"
 property XMLSettings : "~/.ssh-check/iconfigSSHC.py"
 property DNCA : "~/Library/Automator/Display Notification Center Alert.action"
 property DisplayNoticeCenter : false #script switchings to true when running on OS X.8 or higher & if "DNCLocation & DNCA" exists
+property ServiceLevel : false # false for local and true for global search to see if there is a connection to 'service'
 
 on open these_items
 	(* these_items holds a alias list that looks like this: "hostname:Applications:ProgName.app:"
@@ -108,7 +111,7 @@ on updateXML(programName)
 	return false
 end updateXML
 
-on setUpService()
+on setupService()
 	if FileExists(XMLSettings) is true then
 		try
 			set ser to do shell script XMLSettings & space & "-s"
@@ -123,9 +126,32 @@ on setUpService()
 		copy serviceBackup to service
 	end if
 	return false
-end setUpService
+end setupService
 
-on setUpProgram()
+on setServiceLevel()
+	#Should the ssh tunnel to service X be run by the current user or any user on the system?
+	#True is to search globally and False to search locally
+	if FileExists(XMLSettings) is true then
+		try
+			set slevel to do shell script XMLSettings & space & "-sl"
+			if slevel is equal to "globally" then
+				set ServiceLevel to true
+			else if slevel is equal to "locally" then
+				set ServiceLevel to false
+			end if
+			#msg("service level", "", slevel & " = " & ServiceLevel)
+			return ServiceLevel
+			error
+		end try
+	end if
+	
+	if ServiceLevel is "" then
+		set ServiceLevel to false
+	end if
+	return ServiceLevel
+end setServiceLevel
+
+on setupProgram()
 	if FileExists(XMLSettings) is true then
 		try
 			set prog to do shell script XMLSettings & space & "-p"
@@ -140,11 +166,12 @@ on setUpProgram()
 		copy programBackup to program
 	end if
 	return false
-end setUpProgram
+end setupProgram
 
 on sshCheckSettings() #return bool
 	set configFolder to ".ssh-check"
 	set configPath to "~/" & configFolder
+	setServiceLevel()
 	
 	if FolderExists(configPath) is false or FileExists(DNCLocation) is false or FileExists(XMLSettings) is false or (FileExists(DNCA) is false and getOSXNumber() ³ 8) then
 		## setup path, display notification data, and config file manager
@@ -209,8 +236,8 @@ on sshCheckSettings() #return bool
 			end if
 		on error
 			msg("Setup Failed:", "", configPath)
-			setUpService()
-			setUpProgram()
+			setupService()
+			setupProgram()
 			return false
 		end try
 		
@@ -224,7 +251,7 @@ on sshCheckSettings() #return bool
 	end if
 	
 	#loadSettings from config file
-	if setUpService() is true and setUpProgram() is true then
+	if setupService() is true and setupProgram() is true then
 		return true
 	end if
 	
@@ -295,9 +322,18 @@ end killRunningApp
 
 on serviceAlive()
 	try #check for ssh connected to defined service
-		set cmdSSH to "ps x | grep -i ssh | grep '.*@.*" & service & "' | awk '{print $8}'"
-		set sshcon to item 2 of paragraphs of (do shell script cmdSSH)
+		set sshcon to ""
+		if ServiceLevel is false then
+			#is the service being run by the current user?
+			set cmdSSH to "ps x | grep -i ssh | grep '.*@.*" & service & "' | awk '{print $8}'"
+			set sshcon to item 2 of paragraphs of (do shell script cmdSSH)
+		else
+			#is the service being run by any user
+			set cmdSSH to "ps a | grep -i ssh | grep '.*@.*" & service & "' | awk '{print $8}'"
+			set sshcon to item 1 of paragraphs of (do shell script cmdSSH)
+		end if
 		copy sshcon to tunnel
+		
 		if tunnel contains service then
 			return tunnel
 		else

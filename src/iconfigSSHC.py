@@ -1,7 +1,7 @@
 #!/usr/bin/python
 __author__ = 'Jason Campisi'
 # Program: iconfigSSHC.py 
-# Version: 0.1.2
+ver = "version 0.2"
 # Author: Jason Campisi
 # Date: 9.29.13
 # License: GPL 2 or higher
@@ -12,6 +12,7 @@ __author__ = 'Jason Campisi'
 #     <settings name="sshcheck">
 #         <program>Firefox</program>
 #         <service>tunnelr.com</service>
+#         <servicelevel>locally</servicelevel>
 #     </settings>
 # </data>
 #
@@ -20,10 +21,11 @@ __author__ = 'Jason Campisi'
 
 import getopt, sys, os, getpass
 import xml.etree.ElementTree as ET
-import argparse
+import argparse # ref http://pymotw.com/2/argparse/
 
 program = "Firefox"
 service = "tunnelr.com"
+localOrGlobal = "locally"
 
 def getProgram(root):
 	"""Returns program name in xml file or returns None"""
@@ -35,6 +37,13 @@ def getService(root):
 	"""Returns service name in xml file or returns None"""
 	for settings in root.findall('settings'):
 		return settings.find('service').text
+	return "None"
+
+def getServiceLevel(root):
+	"""Returns service level, where to either to search only if 
+	local user is running the service or if anyone is running it"""
+	for settings in root.findall('settings'):
+		return settings.find('servicelevel').text
 	return "None"
 
 def doesFolderExist(folder):
@@ -76,6 +85,7 @@ def createXMLFile(file):
 		f.write('     <settings name="sshcheck">\r\n')
 		f.write('         <program>' + program + '</program>\r\n')
 		f.write('         <service>' + service + '</service>\r\n')
+		f.write('         <servicelevel>' + localOrGlobal + '</servicelevel>\r\n')
 		f.write('     </settings>\r\n')
 		f.write(' </data>\r\n')
 		f.close()
@@ -85,6 +95,7 @@ def createXMLFile(file):
 	return False
 
 def updateProgram(programName, file):
+	"""Update/change stored program name to x"""
 	try:
 		global program 
 		program = programName
@@ -94,9 +105,23 @@ def updateProgram(programName, file):
 	return False
 
 def updateService(server, file):
+	"""update the service name to x"""
 	try:
 		global service 
 		service = server
+		return createXMLFile(file)
+	except Exception:
+		pass
+	return False
+
+def updateServiceLevel(proximity, file):
+	"""update the service-level. True for global and False for local user"""
+	try:
+		global localOrGlobal
+		if proximity is True:
+			localOrGlobal = "globally"
+		else:
+			localOrGlobal = "locally"
 		return createXMLFile(file)
 	except Exception:
 		pass
@@ -110,12 +135,19 @@ def main():
 	 parser = argparse.ArgumentParser(
 	 	prog='iconfigSSHC.py',
 	 	description='Manage SSH-Check\'s config file or generate one when needed. XML management is a pain in Applescript, so this is python script is meant to create serenity from chaos. The goal is to call a xml script with option X and capture Y result from STDIN',
-	 )
+	 ) 
 	 parser.add_argument('-s','--service', help='Find the service name', action='store_true')
+	 parser.add_argument('-sl','--service-level', help='Get service level. Search locally or globally?', action='store_true')
+	 group = parser.add_mutually_exclusive_group()
+	 group.add_argument('-rl','--run_local', help='The service should be run by the local user only', action='store_true', default=False)
+	 group.add_argument('-rg','--run_global', help='The service should be run by any user', action='store_true', default=False)
 	 parser.add_argument('-p','--program', help='Find program name', action='store_true')
 	 parser.add_argument('-c','--create', help='Create the xml file here: ~/.ssh-check/config.xml', action='store_true')
 	 parser.add_argument('-up','--update-program', help='Update the program name')
 	 parser.add_argument('-us','--update-service', help='Update the service name')
+	 parser.add_argument('-ur','--update-run', help='Update running service state "global" or "local"')
+	 parser.add_argument('-v','--version', action='version', version=ver)
+	 
 	 if len(sys.argv)==1:
 	 	parser.print_help()
 	 	sys.exit(1)
@@ -137,7 +169,14 @@ def main():
     elif _args.service:
  		print getService(ET.parse(file).getroot())
     elif _args.program:
-		print getProgram(ET.parse(file).getroot())		
+		print getProgram(ET.parse(file).getroot())
+    elif _args.run_local or _args.run_global:
+		if _args.run_local:
+			print updateServiceLevel(False, file)
+		else:
+			print updateServiceLevel(True, file)
+    elif _args.service_level:	
+		print getServiceLevel(ET.parse(file).getroot())
     else:
 		print "None"
   except ET.ParseError, v:
