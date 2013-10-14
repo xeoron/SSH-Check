@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.7.1
+	Version: 0.7.2
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -302,8 +302,6 @@ on isAppRunning()
 				return true
 			end if
 		end tell
-	on error
-		return false
 	end try
 	return false
 end isAppRunning
@@ -336,12 +334,9 @@ on serviceAlive()
 		
 		if tunnel contains service then
 			return tunnel
-		else
-			return 0
 		end if
-	on error
-		return 0
 	end try
+	return 0
 end serviceAlive
 
 on run
@@ -376,7 +371,7 @@ on run
 			return #exit SSH-Check
 		end if
 	else
-		set qMsg to "Starting " & program
+		set qMsg to "Starting " & program & space
 		if DisplayNoticeCenter is equal to true then
 			msg("SSH-Check", serviceAlive() & space & "is active", qMsg & "up now!")
 			delay (countdown / 3)
