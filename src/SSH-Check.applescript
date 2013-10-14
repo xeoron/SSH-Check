@@ -175,7 +175,7 @@ on sshCheckSettings() #return bool
 	
 	if FolderExists(configPath) is false or FileExists(DNCLocation) is false or FileExists(XMLSettings) is false or (FileExists(DNCA) is false and getOSXNumber() ³ 8) then
 		## setup path, display notification data, and config file manager
-		## Note: s copy of the workflow folder, DNC action-script, and iconfigSSHC.py master copy is stored inside SSH-Check binary 
+		## Note: a copy of the workflow folder, DNC action-script, and iconfigSSHC.py master copy is stored inside SSH-Check binary 
 		set mypath to "cd " & configPath & space & "&&" & space
 		set supportLoc to (POSIX path of (path to me as string)) & "Contents/Support/"
 		
