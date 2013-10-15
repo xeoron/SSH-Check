@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.7.2-1
+	Version: 0.7.3
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -171,7 +171,9 @@ end setupProgram
 on sshCheckSettings() #return bool
 	set configFolder to ".ssh-check"
 	set configPath to "~/" & configFolder
-	setServiceLevel()
+	if FolderExists(configPath) then
+		setServiceLevel()
+	end if
 	
 	if FolderExists(configPath) is false or FileExists(DNCLocation) is false or FileExists(XMLSettings) is false or (FileExists(DNCA) is false and getOSXNumber() ³ 8) then
 		## setup path, display notification data, and config file manager
@@ -373,7 +375,7 @@ on run
 	else
 		set qMsg to "Starting " & program & space
 		if DisplayNoticeCenter is equal to true then
-			msg("SSH-Check", serviceAlive() & space & "is active", qMsg & "up now!")
+			msg("SSH-Check", isServiceAlive & space & "is active", qMsg & "up now!")
 			delay (countdown / 3)
 		else
 			set btnOpt to {"Launch", "Stop"}
