@@ -171,9 +171,6 @@ end setupProgram
 on sshCheckSettings() #return bool
 	set configFolder to ".ssh-check"
 	set configPath to "~/" & configFolder
-	if FolderExists(configPath) then
-		setServiceLevel()
-	end if
 	
 	if FolderExists(configPath) is false or FileExists(DNCLocation) is false or FileExists(XMLSettings) is false or (FileExists(DNCA) is false and getOSXNumber() ³ 8) then
 		## setup path, display notification data, and config file manager
@@ -253,6 +250,7 @@ on sshCheckSettings() #return bool
 	end if
 	
 	#loadSettings from config file
+	setServiceLevel()
 	if setupService() is true and setupProgram() is true then
 		return true
 	end if
