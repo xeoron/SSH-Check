@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.7.4
+	Version: 0.7.4-1
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -172,7 +172,7 @@ on sshCheckSettings() #return bool
 	set configFolder to ".ssh-check"
 	set configPath to "~/" & configFolder
 	
-	if FolderExists(configPath) is false or FileExists(DNCLocation) is false or FileExists(XMLSettings) is false or (FileExists(DNCA) is false) then
+	if FolderExists(configPath) is false or FileExists(XMLSettings) is false or (getOSXNumber() ³ 8 and (FileExists(DNCLocation) is false or FileExists(DNCA) is false)) then
 		## setup path, display notification data, and config file manager
 		## Note: a copy of the workflow folder, DNC action-script, and iconfigSSHC.py master copy is stored inside SSH-Check binary 
 		set mypath to "cd " & configPath & space & "&&" & space
@@ -195,42 +195,44 @@ on sshCheckSettings() #return bool
 				delay 0.5
 			end if
 			
-			if FileExists(DNCA) is false and getOSXNumber() ³ 8 then
-				#setup Automator Display Notification Center Action script
-				set alertAction to "Display_Notification_Center_Alert.action.zip"
-				do shell script mypath & "cp " & supportLoc & alertAction & space & "./"
-				delay 0.5
-				
-				if FileExists(configPath & "/" & alertAction) is true then
-					set cmdUnzipAlertAction to mypath & "unzip -u" & space & alertAction
-					do shell script cmdUnzipAlertAction
-					set cmdCleanUpAlertAction to mypath & "rm -rf __MACOSX/" & space & alertAction
-					do shell script cmdCleanUpAlertAction
-				end if
-				set qMsg to "SSH-Check would like to setup Automator Notification Center. Press 'Yes' to setup and 'No' to skip!"
-				set btnOpt to {"Yes", "No"}
-				try
-					set yesOrNo to button returned of (display dialog qMsg buttons btnOpt default button "No" with title "SSH-Check Setup Needs Your Help" giving up after countdown * 60)
-					if yesOrNo is "Yes" then
-						do shell script mypath & "open " & quoted form of "Display Notification Center Alert.action"
+			if getOSXNumber() ³ 8 then
+				if FileExists(DNCA) is false then
+					#setup Automator Display Notification Center Action script
+					set alertAction to "Display_Notification_Center_Alert.action.zip"
+					do shell script mypath & "cp " & supportLoc & alertAction & space & "./"
+					delay 0.5
+					
+					if FileExists(configPath & "/" & alertAction) is true then
+						set cmdUnzipAlertAction to mypath & "unzip -u" & space & alertAction
+						do shell script cmdUnzipAlertAction
+						set cmdCleanUpAlertAction to mypath & "rm -rf __MACOSX/" & space & alertAction
+						do shell script cmdCleanUpAlertAction
 					end if
-					error
-					msg("SSH-Check: Error", "", "Failed to install action script!")
-				end try
-				delay 0.5
-			end if
-			
-			if FolderExists(configPath) is true and FileExists(DNCLocation) is false then
-				#setup display notification center workflow
-				set DNWorkflow to "Display_Notification.workflow.zip"
-				set cmdUnzipDNWorkflow to mypath & "unzip -u" & space & DNWorkflow
-				set cmdCleanUpDNWorkflow to mypath & "rm -rf __MACOSX/" & space & DNWorkflow
-				do shell script mypath & "cp " & supportLoc & DNWorkflow & space & "./"
-				delay 0.5
+					set qMsg to "SSH-Check would like to setup Automator Notification Center. Press 'Yes' to setup and 'No' to skip!"
+					set btnOpt to {"Yes", "No"}
+					try
+						set yesOrNo to button returned of (display dialog qMsg buttons btnOpt default button "No" with title "SSH-Check Setup Needs Your Help" giving up after countdown * 60)
+						if yesOrNo is "Yes" then
+							do shell script mypath & "open " & quoted form of "Display Notification Center Alert.action"
+						end if
+						error
+						msg("SSH-Check: Error", "", "Failed to install action script!")
+					end try
+					delay 0.5
+				end if
 				
-				if FileExists(configPath & "/" & DNWorkflow) is true then
-					do shell script cmdUnzipDNWorkflow
-					do shell script cmdCleanUpDNWorkflow
+				if FolderExists(configPath) is true and FileExists(DNCLocation) is false then
+					#setup display notification center workflow
+					set DNWorkflow to "Display_Notification.workflow.zip"
+					set cmdUnzipDNWorkflow to mypath & "unzip -u" & space & DNWorkflow
+					set cmdCleanUpDNWorkflow to mypath & "rm -rf __MACOSX/" & space & DNWorkflow
+					do shell script mypath & "cp " & supportLoc & DNWorkflow & space & "./"
+					delay 0.5
+					
+					if FileExists(configPath & "/" & DNWorkflow) is true then
+						do shell script cmdUnzipDNWorkflow
+						do shell script cmdCleanUpDNWorkflow
+					end if
 				end if
 			end if
 		on error
