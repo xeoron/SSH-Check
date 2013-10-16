@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.7.3
+	Version: 0.7.4
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -172,7 +172,7 @@ on sshCheckSettings() #return bool
 	set configFolder to ".ssh-check"
 	set configPath to "~/" & configFolder
 	
-	if FolderExists(configPath) is false or FileExists(DNCLocation) is false or FileExists(XMLSettings) is false or (FileExists(DNCA) is false and getOSXNumber() ³ 8) then
+	if FolderExists(configPath) is false or FileExists(DNCLocation) is false or FileExists(XMLSettings) is false or (FileExists(DNCA) is false) then
 		## setup path, display notification data, and config file manager
 		## Note: a copy of the workflow folder, DNC action-script, and iconfigSSHC.py master copy is stored inside SSH-Check binary 
 		set mypath to "cd " & configPath & space & "&&" & space
