@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.7.4-1
+	Version: 0.7.5
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -138,6 +138,8 @@ on setServiceLevel()
 				set ServiceLevel to true
 			else if slevel is equal to "locally" then
 				set ServiceLevel to false
+			else
+				set ServiceLevel to false
 			end if
 			#msg("service level", "", slevel & " = " & ServiceLevel)
 			return ServiceLevel
@@ -198,27 +200,33 @@ on sshCheckSettings() #return bool
 			if getOSXNumber() ³ 8 then
 				if FileExists(DNCA) is false then
 					#setup Automator Display Notification Center Action script
-					set alertAction to "Display_Notification_Center_Alert.action.zip"
-					do shell script mypath & "cp " & supportLoc & alertAction & space & "./"
-					delay 0.5
-					
-					if FileExists(configPath & "/" & alertAction) is true then
-						set cmdUnzipAlertAction to mypath & "unzip -u" & space & alertAction
-						do shell script cmdUnzipAlertAction
-						set cmdCleanUpAlertAction to mypath & "rm -rf __MACOSX/" & space & alertAction
-						do shell script cmdCleanUpAlertAction
-					end if
 					set qMsg to "SSH-Check would like to setup Automator Notification Center. Press 'Yes' to setup and 'No' to skip!"
 					set btnOpt to {"Yes", "No"}
 					try
 						set yesOrNo to button returned of (display dialog qMsg buttons btnOpt default button "No" with title "SSH-Check Setup Needs Your Help" giving up after countdown * 60)
-						if yesOrNo is "Yes" then
-							do shell script mypath & "open " & quoted form of "Display Notification Center Alert.action"
-						end if
-						error
-						msg("SSH-Check: Error", "", "Failed to install action script!")
 					end try
-					delay 0.5
+					if yesOrNo is "Yes" then
+						set alertAction to "Display_Notification_Center_Alert.action.zip"
+						try
+							do shell script mypath & "cp " & supportLoc & alertAction & space & "./"
+						end try
+						delay 0.5
+						
+						if FileExists(configPath & "/" & alertAction) is true then
+							try
+								set cmdUnzipAlertAction to mypath & "unzip -u" & space & alertAction
+								do shell script cmdUnzipAlertAction
+								set cmdCleanUpAlertAction to mypath & "rm -rf __MACOSX/" & space & alertAction
+								do shell script cmdCleanUpAlertAction
+							end try
+						end if
+						try
+							do shell script mypath & "open " & quoted form of "Display Notification Center Alert.action"
+							error
+							msg("SSH-Check: Error", "", "Failed to install action script!")
+						end try
+						delay 0.5
+					end if #end of "Yes" go setup DNCA
 				end if
 				
 				if FolderExists(configPath) is true and FileExists(DNCLocation) is false then
@@ -226,12 +234,16 @@ on sshCheckSettings() #return bool
 					set DNWorkflow to "Display_Notification.workflow.zip"
 					set cmdUnzipDNWorkflow to mypath & "unzip -u" & space & DNWorkflow
 					set cmdCleanUpDNWorkflow to mypath & "rm -rf __MACOSX/" & space & DNWorkflow
-					do shell script mypath & "cp " & supportLoc & DNWorkflow & space & "./"
+					try
+						do shell script mypath & "cp " & supportLoc & DNWorkflow & space & "./"
+					end try
 					delay 0.5
 					
 					if FileExists(configPath & "/" & DNWorkflow) is true then
-						do shell script cmdUnzipDNWorkflow
-						do shell script cmdCleanUpDNWorkflow
+						try
+							do shell script cmdUnzipDNWorkflow
+							do shell script cmdCleanUpDNWorkflow
+						end try
 					end if
 				end if
 			end if
@@ -376,7 +388,7 @@ on run
 		set qMsg to "Starting " & program & space
 		if DisplayNoticeCenter is equal to true then
 			msg("SSH-Check", isServiceAlive & space & "is active", qMsg & "up now!")
-			delay (countdown / 3)
+			delay (countdown / 9)
 		else
 			set btnOpt to {"Launch", "Stop"}
 			try
