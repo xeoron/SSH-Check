@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.7.5-1
+	Version: 0.7.6
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -30,6 +30,7 @@ property XMLSettings : "~/.ssh-check/iconfigSSHC.py"
 property DNCA : "~/Library/Automator/Display Notification Center Alert.action"
 property DisplayNoticeCenter : false #script switchings to true when running on OS X.8 or higher & if "DNCLocation & DNCA" exists
 property ServiceLevel : false # false for local and true for global search to see if there is a connection to 'service'
+property OSX : 6 #which OSX version is being used?
 
 on open these_items
 	(* these_items holds a alias list that looks like this: "hostname:Applications:ProgName.app:"
@@ -61,13 +62,15 @@ on resetProgram()
 	set DisplayNoticeCenter to false
 end resetProgram
 
-on getOSXNumber()
+on setOSXNumber()
 	set text item delimiters to "."
-	return ((text item 2 of (system version of (system info))) as number)
-end getOSXNumber
+	copy ((text item 2 of (system version of (system info))) as number) to OSX
+	--display dialog "osx is this " & OSX
+end setOSXNumber
 
 on setDisplay()
-	if getOSXNumber() ³ 8 and FileExists(DNCLocation) is equal to true and FileExists(DNCA) is true then
+	setOSXNumber()
+	if OSX ³ 9 or (OSX is 8 and FileExists(DNCLocation) is equal to true and FileExists(DNCA) is true) then
 		set DisplayNoticeCenter to true
 	else
 		set DisplayNoticeCenter to false
@@ -174,7 +177,7 @@ on sshCheckSettings() #return bool
 	set configFolder to ".ssh-check"
 	set configPath to "~/" & configFolder
 	
-	if FolderExists(configPath) is false or FileExists(XMLSettings) is false or (getOSXNumber() ³ 8 and (FileExists(DNCLocation) is false or FileExists(DNCA) is false)) then
+	if FolderExists(configPath) is false or FileExists(XMLSettings) is false or (OSX is 8 and (FileExists(DNCLocation) is false or FileExists(DNCA) is false)) then
 		## setup path, display notification data, and config file manager
 		## Note: a copy of the workflow folder, DNC action-script, and iconfigSSHC.py master copy is stored inside SSH-Check binary 
 		set mypath to "cd " & configPath & space & "&&" & space
@@ -197,7 +200,7 @@ on sshCheckSettings() #return bool
 				delay 0.5
 			end if
 			
-			if getOSXNumber() ³ 8 then
+			if OSX is 8 then #OS X.8 only Display Noticafaction Center install support
 				if FileExists(DNCA) is false then
 					#setup Automator Display Notification Center Action script
 					set qMsg to "SSH-Check would like to setup Automator Notification Center. Press 'Yes' to setup and 'No' to skip!"
@@ -272,9 +275,12 @@ on sshCheckSettings() #return bool
 	return false
 end sshCheckSettings
 
-on notify(title, subtitle, message)
-	(* 	OS X 8+ make use of System Notifacation Center
- Requires: SETUP 
+on notify(msgTitle, msgSubtitle, message)
+	if OSX ³ 9 then -- use OS X Noticafaction Center: OS x.9 http://macosxautomation.com/mavericks/notifications/01.html
+		display notification message with title msgTitle subtitle msgSubtitle
+	else #if OSX is 8 --OS X.8 Mountain Lion DNC does not have Applescript support, so this provides it
+		(* 	OS X 8 make use of System Notifacation Center
+     Requires: SETUP 
  	1) automation workflow to be installed from http://www.automatedworkflows.com/2012/08/26/display-notification-center-alert-automator-action-1-0-0/
 	2) Create a new workflow in Automator containing only the Display Notification Center Alert action.
 	3) In the variables section at the bottom of the workflow construction area in Automator's window, create three variables named title, subtitle, and message.
@@ -285,21 +291,21 @@ on notify(title, subtitle, message)
 	Now you can display a notification from the command line using the following command:
 		automator -D title='Title text' -D subtitle='Subtitle text' -D message='Message text' ~/.ssh-check/Display_Notification.workflow
  *)
-	
-	if title as text is not "" then set title to " -D title=" & quoted form of (title as text)
-	if subtitle as text is not "" then set subtitle to " -D subtitle=" & quoted form of (subtitle as text)
-	if message as text is not "" then set message to " -D message=" & quoted form of (message as text)
-	try
-		do shell script "automator" & space & title & space & subtitle & space & message & space & DNCLocation & space & "2>/dev/null"
-	on error
-		set DisplayNoticeCenter to "false"
-		msg("SSH-Check: Error", "", "Unable to comminucate with the Notifacation Center automator workflow action: " & DNCLocation)
-	end try
+		if msgTitle as text is not "" then set msgTitle to " -D title=" & quoted form of (msgTitle as text)
+		if msgSubtitle as text is not "" then set msgSubtitle to " -D subtitle=" & quoted form of (msgSubtitle as text)
+		if message as text is not "" then set message to " -D message=" & quoted form of (message as text)
+		try
+			do shell script "automator" & space & msgTitle & space & msgSubtitle & space & message & space & DNCLocation & space & "2>/dev/null"
+		on error
+			set DisplayNoticeCenter to "false"
+			msg("SSH-Check: Error", "", "Unable to comminucate with the Notifacation Center automator workflow action: " & DNCLocation)
+		end try
+	end if
 end notify
 
-on msg(msgTitle, subtitle, message)
-	if DisplayNoticeCenter is equal to true then -- use OS X Noticafaction Center
-		notify(msgTitle, subtitle, message)
+on msg(msgTitle, msgSub, message)
+	if DisplayNoticeCenter then
+		notify(msgTitle, msgSub, message)
 	else
 		try
 			return display dialog message with title msgTitle
