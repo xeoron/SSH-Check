@@ -25,32 +25,27 @@ When you run the program for the first time, it will setup several things, inclu
 To update the settings, at the command-line, use the following commands:
 
 	cd ~/.ssh-check
-	./iconfigSSHC.py -up "vlc"          <-- update program name
+	./iconfigSSHC.py -up "Safari"       <-- update program name
 	./iconfigSSHC.py -us "192.168.1.5"  <-- update service name
 	./iconfigSSHC.py -rl				<-- running service must be only from local user
 	./iconfigSSHC.py -rg				<-- running service can be by any user
 	./iconfigSSHC.py -h                 <-- program options
 	
+SSH-Check auto-installs following support files in the folder ~/.ssh-check
+
+	iconfigSSHC.py  
+	config.xml
+	Display_Notification.workflow		<-- OS X.8 Mountain Lion, only.
+
 Requirements
 =====
 Mac OS X Snow Leopard or higher
 
-For NoneDisruptive Messages on OS X.8 (Mountain Lion) or higher the following is required
+For NoneDisruptive Messages OS X.9 Mavericks has native support, but for OS X.8 it will ask for permission to install Ben Waldie's Display Notification Centert Alert Automator Action script
 
 	1) Commandline support for the Notification Center using Ben Waldie's 
 	   Display Notification Centert Alert Automator Action script.
 	2) Display_Notification.workflow 
 
-SSH-Check auto-installs following support files in the folder ~/.ssh-check
 
-	Display_Notification.workflow
-	iconfigSSHC.py  
-	config.xml
-
-It will also ask for permission to install Ben Waldie's Display Notification Centert Alert Automator Action script
-
-Note: with all of the support files setup, you can display a notification from the command line using the following command:
-
-	automator -D title='Title text' -D subtitle='Subtitle text' -D message='Message text' ~/.ssh-check/Display_Notification.workflow
-  
 	
