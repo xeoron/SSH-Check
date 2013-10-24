@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.7.5
+	Version: 0.7.5-1
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -374,7 +374,7 @@ on run
 	set titlemsg to "Active SSH Connection to: " & isServiceAlive
 	if isAppRunning() is equal to true then # should we kill & restart the running app?
 		set btnOpt to {"Restart", "Exit SSH-Check", "Turn Off"}
-		set qMsg to program & " is running! Do you want to: Restart It, Turn it Off, or Exit SSH-Check"
+		set qMsg to program & " is running! Do you want to: Restart It, Turn it Off, or Exit SSH-Check?"
 		set choice to button returned of (display dialog qMsg buttons btnOpt default button "Exit SSH-Check" with title titlemsg)
 		if choice is "Restart" then
 			killRunningApp()
