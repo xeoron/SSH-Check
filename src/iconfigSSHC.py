@@ -52,8 +52,7 @@ def doesFolderExist(folder):
 		if os.path.exists(folder):
 			return True
 	except Expection:
-		pass
-	return False
+		return False
 
 def makeFolder(folder):
 	"""Create a folder at location X, return True/False"""
@@ -63,8 +62,7 @@ def makeFolder(folder):
 		if os.path.exists(folder):
 			return True
 	except IOError:
-		pass
-	return False
+		return False
 
 def doesFileExist(file):
 	"""Checks to see if the xml file exists
@@ -73,8 +71,7 @@ def doesFileExist(file):
 		with open(file):pass
 		return True
 	except IOError:
-		pass
-	return False
+		return False
 
 def createXMLFile(file):
 	"""Create a getxml XML File at location X. return True/False"""
@@ -91,8 +88,7 @@ def createXMLFile(file):
 		f.close()
 		return doesFileExist(file)
 	except Exception:
-		pass
-	return False
+		return False
 
 def updateProgram(programName, file):
 	"""Update/change stored program name to x"""
@@ -101,8 +97,7 @@ def updateProgram(programName, file):
 		program = programName
 		return createXMLFile(file)
 	except Exception:
-		pass
-	return False
+		return False
 
 def updateService(server, file):
 	"""update the service name to x"""
@@ -111,8 +106,7 @@ def updateService(server, file):
 		service = server
 		return createXMLFile(file)
 	except Exception:
-		pass
-	return False
+		return False
 
 def updateServiceLevel(proximity, file):
 	"""update the service-level. True for global and False for local user"""
@@ -124,8 +118,7 @@ def updateServiceLevel(proximity, file):
 			localOrGlobal = "locally"
 		return createXMLFile(file)
 	except Exception:
-		pass
-	return False
+		return False
 
 def main():
   try:
