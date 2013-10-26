@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.7.6
+	Version: 0.7.7
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -200,7 +200,7 @@ on sshCheckSettings() #return bool
 				delay 0.5
 			end if
 			
-			if OSX is 8 then #OS X.8 only Display Noticafaction Center install support
+			if OSX is 8 then #OS X.8 only install Display Noticafaction Center support
 				if FileExists(DNCA) is false then
 					#setup Automator Display Notification Center Action script
 					set qMsg to "SSH-Check would like to setup Automator Notification Center. Press 'Yes' to setup and 'No' to skip!"
@@ -359,6 +359,14 @@ on serviceAlive()
 	return 0
 end serviceAlive
 
+on copyServiceToClipboard()
+	-- copy the service name to the clipboard to easily check in a terminal, webbrowser, etc
+	try
+		do shell script XMLSettings & space & "-x"
+		error
+	end try
+end copyServiceToClipboard
+
 on run
 	resetProgram()
 	sshCheckSettings()
@@ -370,9 +378,11 @@ on run
 		set message to "It is not safe to run " & program & ". Force it to quit by pressing \"OK\"!"
 		msg(titlemsg, "Warning " & service, message)
 		killRunningApp()
+		copyServiceToClipboard()
 		return #exit SSH-Check
 	else if isServiceAlive is equal to 0 then
 		msg(titlemsg, "Warning about " & service, "Don't run " & program & ", because there's no connection to " & service & ".")
+		copyServiceToClipboard()
 		return #exit SSH-Check
 	end if
 	
