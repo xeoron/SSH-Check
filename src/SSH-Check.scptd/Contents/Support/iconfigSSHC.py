@@ -1,7 +1,7 @@
 #!/usr/bin/python
 __author__ = 'Jason Campisi'
 # Program: iconfigSSHC.py 
-ver = "version 0.5.2"
+ver = "version 0.5.3"
 # Author: Jason Campisi
 # Date: 9.29.13
 # License: GPL 2 or higher
@@ -182,7 +182,6 @@ if __name__ == "__main__":
 		parser.add_argument('-x','--copy-to-clipboard', help='Copy the Service name to the system clipboard', action='store_true')
 		parser.add_argument('-up','--update-program', help='Update the program name')
 		parser.add_argument('-us','--update-service', help='Update the service name')
-		parser.add_argument('-ur','--update-run', help='Update running service state "global" or "local"')
 		parser.add_argument('-v','--version', action='version', version=ver)
 	 
 		if len(sys.argv)==1:
