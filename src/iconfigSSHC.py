@@ -1,7 +1,7 @@
 #!/usr/bin/python
 __author__ = 'Jason Campisi'
 # Program: iconfigSSHC.py 
-ver = "version 0.3.1"
+ver = "version 0.4"
 # Author: Jason Campisi
 # Date: 9.29.13
 # License: GPL 2 or higher
@@ -78,23 +78,44 @@ def doesFileExist(file):
 
 def createXMLFile(file):
 	"""Create a getxml XML File at location X. return True/False"""
+	#the xml string is concatenated merely for easy human reading/updating
+	xml = ''
+	xml = '<?xml version="1.0"?>\r\n' 
+	xml += ' <data>\r\n'
+	xml += '     <settings name="sshcheck">\r\n'
+	xml += '         <program>' + program + '</program>\r\n'
+	xml += '         <service>' + service + '</service>\r\n'
+	xml += '         <servicelevel>' + localOrGlobal + '</servicelevel>\r\n'
+	xml += '     </settings>\r\n'
+	xml += ' </data>\r\n'
 	try:
 		f = open(file, 'w')
-		f.write('<?xml version="1.0"?>\r\n')
-		f.write(' <data>\r\n')
-		f.write('     <settings name="sshcheck">\r\n')
-		f.write('         <program>' + program + '</program>\r\n')
-		f.write('         <service>' + service + '</service>\r\n')
-		f.write('         <servicelevel>' + localOrGlobal + '</servicelevel>\r\n')
-		f.write('     </settings>\r\n')
-		f.write(' </data>\r\n')
+		f.write(xml)
 		f.close()
 		return doesFileExist(file)
 	except Exception:
 		return False
 
+def loadConfig(file):
+	"""load the values from the config file"""
+	root = ET.parse(file).getroot()
+	s=getService(root)
+	p=getProgram(root)
+	lg=getServiceLevel(root)
+	
+	if p !=None:
+		global program
+		program = p
+	if s !=None:
+		global service
+		service = s
+	if lg !=None:
+		global localOrGlobal
+		localOrGlobal = lg
+
 def updateProgram(programName, file):
 	"""Update/change stored program name to x"""
+	loadConfig(file)
 	try:
 		global program 
 		program = programName
@@ -104,15 +125,18 @@ def updateProgram(programName, file):
 
 def updateService(server, file):
 	"""update the service name to x"""
+	loadConfig(file)
 	try:
 		global service 
 		service = server
+		global program
 		return createXMLFile(file)
 	except Exception:
 		return False
 
 def updateServiceLevel(proximity, file):
 	"""update the service-level. True for global and False for local user"""
+	loadConfig(file)
 	try:
 		global localOrGlobal
 		if proximity is True:
