@@ -1,7 +1,7 @@
 #!/usr/bin/python
 __author__ = 'Jason Campisi'
 # Program: iconfigSSHC.py 
-ver = "version 0.3"
+ver = "version 0.3.1"
 # Author: Jason Campisi
 # Date: 9.29.13
 # License: GPL 2 or higher
@@ -61,10 +61,9 @@ def doesFolderExist(folder):
 def makeFolder(folder):
 	"""Create a folder at location X, return True/False"""
 	try:
-		if not os.path.exists(folder):
+		if not doesFolderExist(folder):
 			os.makedirs(folder)
-		if os.path.exists(folder):
-			return True
+		return doesFolderExist(folder)
 	except IOError:
 		return False
 

@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.7.7
+	Version: 0.7.7-1
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -26,7 +26,7 @@ property serviceBackup : "tunnelr.com"
 
 property countdown : "6" #time out in seconds
 property DNCLocation : "~/.ssh-check/Display_Notification.workflow"
-property XMLSettings : "~/.ssh-check/iconfigSSHC.py"
+property XMLSettings : (POSIX path of (path to me as string)) & "Contents/Support/iconfigSSHC.py"
 property DNCA : "~/Library/Automator/Display Notification Center Alert.action"
 property DisplayNoticeCenter : false #script switchings to true when running on OS X.8 or higher & if "DNCLocation & DNCA" exists
 property ServiceLevel : false # false for local and true for global search to see if there is a connection to 'service'
@@ -176,8 +176,9 @@ end setupProgram
 on sshCheckSettings() #return bool
 	set configFolder to ".ssh-check"
 	set configPath to "~/" & configFolder
+	set iconfig to "~/.ssh-check/iconfigSSHC.py"
 	
-	if FolderExists(configPath) is false or FileExists(XMLSettings) is false or (OSX is 8 and (FileExists(DNCLocation) is false or FileExists(DNCA) is false)) then
+	if FolderExists(configPath) is false or FileExists(iconfig) is false or (OSX is 8 and (FileExists(DNCLocation) is false or FileExists(DNCA) is false)) then
 		## setup path, display notification data, and config file manager
 		## Note: a copy of the workflow folder, DNC action-script, and iconfigSSHC.py master copy is stored inside SSH-Check binary 
 		set mypath to "cd " & configPath & space & "&&" & space
@@ -190,8 +191,8 @@ on sshCheckSettings() #return bool
 				delay 0.5 #note: FileExist will fail, even if true, if the program does not pause first
 			end if
 			
-			if FileExists(XMLSettings) is false then
-				#note: the first time XMLSettings (iconfigSSHC.py) is asked for data it will generate config.xml, 
+			if FileExists(iconfig) is false then
+				#note: the first time XMLSettings (iconfigSSHC.py) is asked for data it will generate config.xml,
 				#then all other times it will use the data set in the file. And, if config.xml becomes corrupt, iconfigSSHC.py will replace it
 				try
 					do shell script mypath & "cp " & supportLoc & "iconfigSSHC.py ./"
