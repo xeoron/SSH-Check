@@ -1,7 +1,7 @@
 #!/usr/bin/python
 __author__ = 'Jason Campisi'
 # Program: iconfigSSHC.py 
-ver = "version 0.4"
+ver = "version 0.4.1"
 # Author: Jason Campisi
 # Date: 9.29.13
 # License: GPL 2 or higher
@@ -80,7 +80,7 @@ def createXMLFile(file):
 	"""Create a getxml XML File at location X. return True/False"""
 	#the xml string is concatenated merely for easy human reading/updating
 	xml = ''
-	xml = '<?xml version="1.0"?>\r\n' 
+	xml += '<?xml version="1.0"?>\r\n' 
 	xml += ' <data>\r\n'
 	xml += '     <settings name="sshcheck">\r\n'
 	xml += '         <program>' + program + '</program>\r\n'
