@@ -1,7 +1,7 @@
 #!/usr/bin/python
 __author__ = 'Jason Campisi'
 # Program: iconfigSSHC.py 
-ver = "version 0.5.1"
+ver = "version 0.5.2"
 # Author: Jason Campisi
 # Date: 9.29.13
 # License: GPL 2 or higher
@@ -55,9 +55,7 @@ def getServiceLevel(root):
 def doesFolderExist(folder):
 	"""Does a folder exist? True/False"""
 	try:
-		if os.path.exists(folder):
-			return True
-		return False
+		return os.path.exists(folder)
 	except Expection:
 		return False
 
