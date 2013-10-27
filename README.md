@@ -11,6 +11,8 @@ Sometimes you don't realize that the SSH connection has timed-out or dropped for
 
 It will launch the pre-set program, only if there is a SSH connection to tunnelr.com (this can be changed, see below details). And, if the program of choice is already running, SSH-Check will then ask you to either Restart It or Force It To Stop Running or Do Nothing; but if there is no SSH connection while the program is running, then it will force the program exit.
 
+If the there is no SSH connection to the server, then the service name will be copied to the system clipboard.
+
 Program Defaults
 ======
 Reprogram which program to launch by dropping a program onto SSH-Check.
@@ -29,6 +31,7 @@ To update the settings, at the command-line, use the following commands:
 	./iconfigSSHC.py -us "192.168.1.5"  <-- update service name
 	./iconfigSSHC.py -rl				<-- running service must be only from local user
 	./iconfigSSHC.py -rg				<-- running service can be by any user
+	./iconfigSSHC.py -x					<-- copy the service name to the system clipboard
 	./iconfigSSHC.py -h                 <-- program options
 	
 SSH-Check auto-installs following support files in the folder ~/.ssh-check
