@@ -1,12 +1,16 @@
 #!/usr/bin/python
 __author__ = 'Jason Campisi'
 # Program: iconfigSSHC.py 
-ver = "version 0.4.1"
+ver = "version 0.5"
 # Author: Jason Campisi
 # Date: 9.29.13
 # License: GPL 2 or higher
-# Purpose: if $HOME/.ssh-check/ or $HOME/.ssh-check/config.xml do not exist, then create them
-# Next grab & display the program and service attributes from the following xml format:
+# Purpose: Settings manager for SSH-Check.app
+#  This program is meant to be used in 2 ways
+#     1) directly by a user to manage settings
+#     2) to be called by another program in a different langauge (where it will parse the results)
+#  If $HOME/.ssh-check/ or $HOME/.ssh-check/config.xml do not exist, then create them.
+#  Next grab & display the program and service attributes from the following xml format:
 # <?xml version="1.0"?>
 # <data>
 #     <settings name="sshcheck">
@@ -15,9 +19,7 @@ ver = "version 0.4.1"
 #         <servicelevel>locally</servicelevel>
 #     </settings>
 # </data>
-#
-#
-#
+
 
 import sys, os, getpass 
 import subprocess #copy to clipboard
@@ -98,10 +100,15 @@ def createXMLFile(file):
 
 def loadConfig(file):
 	"""load the values from the config file"""
-	root = ET.parse(file).getroot()
-	s=getService(root)
-	p=getProgram(root)
-	lg=getServiceLevel(root)
+	try:
+		root = ET.parse(file).getroot()
+		s=getService(root)
+		p=getProgram(root)
+		lg=getServiceLevel(root)
+	except ET.ParseError, v:
+		row, column = v.position
+		print "XML Error: error on row", row, "column", column, ":", v 
+		raise
 	
 	if p !=None:
 		global program
@@ -115,8 +122,8 @@ def loadConfig(file):
 
 def updateProgram(programName, file):
 	"""Update/change stored program name to x"""
-	loadConfig(file)
 	try:
+		loadConfig(file)
 		global program 
 		program = programName
 		return createXMLFile(file)
@@ -125,8 +132,8 @@ def updateProgram(programName, file):
 
 def updateService(server, file):
 	"""update the service name to x"""
-	loadConfig(file)
 	try:
+		loadConfig(file)
 		global service 
 		service = server
 		global program
@@ -136,8 +143,8 @@ def updateService(server, file):
 
 def updateServiceLevel(proximity, file):
 	"""update the service-level. True for global and False for local user"""
-	loadConfig(file)
 	try:
+		loadConfig(file)
 		global localOrGlobal
 		if proximity is True:
 			localOrGlobal = "globally"
@@ -156,71 +163,63 @@ def sendToClipboard(msg="None"):
 	except Exception:
 		return False
 
-def main():
-  try:
-	 folder = "".join(['/Users/', getpass.getuser(), '/.ssh-check/'])
-	 file   = "".join(['/Users/', getpass.getuser(), '/.ssh-check/config.xml'])
+
+if __name__ == "__main__":
+	try:
+		folder = "".join(['/Users/', getpass.getuser(), '/.ssh-check/'])
+		file   = "".join([folder, 'config.xml'])
+
+		parser = argparse.ArgumentParser(
+			prog='iconfigSSHC.py',
+			description='Manage SSH-Check\'s config file or generate one when needed. XML management is a pain in Applescript, so this is python script is meant to create serenity from chaos. The goal is to call a xml script with option X and capture Y result from STDIN',
+		) 
+		parser.add_argument('-s','--service', help='Find the service name', action='store_true')
+		parser.add_argument('-sl','--service-level', help='Get service level. Search locally or globally?', action='store_true')
+		group = parser.add_mutually_exclusive_group()
+		group.add_argument('-rl','--run_local', help='The service should be run by the local user only', action='store_true', default=False)
+		group.add_argument('-rg','--run_global', help='The service should be run by any user', action='store_true', default=False)
+		parser.add_argument('-p','--program', help='Find program name', action='store_true')
+		parser.add_argument('-c','--create', help='Create the xml file here: ~/.ssh-check/config.xml', action='store_true')
+		parser.add_argument('-x','--copy-to-clipboard', help='Copy the Service name to the system clipboard', action='store_true')
+		parser.add_argument('-up','--update-program', help='Update the program name')
+		parser.add_argument('-us','--update-service', help='Update the service name')
+		parser.add_argument('-ur','--update-run', help='Update running service state "global" or "local"')
+		parser.add_argument('-v','--version', action='version', version=ver)
 	 
-	 parser = argparse.ArgumentParser(
-		prog='iconfigSSHC.py',
-		description='Manage SSH-Check\'s config file or generate one when needed. XML management is a pain in Applescript, so this is python script is meant to create serenity from chaos. The goal is to call a xml script with option X and capture Y result from STDIN',
-	 ) 
-	 parser.add_argument('-s','--service', help='Find the service name', action='store_true')
-	 parser.add_argument('-sl','--service-level', help='Get service level. Search locally or globally?', action='store_true')
-	 group = parser.add_mutually_exclusive_group()
-	 group.add_argument('-rl','--run_local', help='The service should be run by the local user only', action='store_true', default=False)
-	 group.add_argument('-rg','--run_global', help='The service should be run by any user', action='store_true', default=False)
-	 parser.add_argument('-p','--program', help='Find program name', action='store_true')
-	 parser.add_argument('-c','--create', help='Create the xml file here: ~/.ssh-check/config.xml', action='store_true')
-	 parser.add_argument('-x','--copy-to-clipboard', help='Copy the Service name to the system clipboard', action='store_true')
-	 parser.add_argument('-up','--update-program', help='Update the program name')
-	 parser.add_argument('-us','--update-service', help='Update the service name')
-	 parser.add_argument('-ur','--update-run', help='Update running service state "global" or "local"')
-	 parser.add_argument('-v','--version', action='version', version=ver)
-	 
-	 if len(sys.argv)==1:
-		parser.print_help()
-		sys.exit(1)
-	 _args = parser.parse_args() 
+		if len(sys.argv)==1:
+			parser.print_help()
+			sys.exit(1)
+		_args = parser.parse_args() 
 		
-	 if (not doesFolderExist(folder) and not makeFolder(folder)) or (not doesFileExist(file) and not createXMLFile(file)):
+		if (not doesFolderExist(folder) and not makeFolder(folder)) or (not doesFileExist(file) and not createXMLFile(file)):
 			print None
 			sys.exit(2)
-  except IOError as err:
+	except IOError as err:
 		print None
 		sys.exit(2)
  
-  try:
-	if _args.update_service != None:
-		print updateService(_args.update_service, file)
-	elif _args.update_program != None:
-		print updateProgram(_args.update_program, file)
-	elif _args.create:
-		print createXMLFile(file)
-	elif _args.service:
-		print getService(ET.parse(file).getroot())
-	elif _args.copy_to_clipboard:
-		print sendToClipboard(getService(ET.parse(file).getroot()))
-	elif _args.program:
-		print getProgram(ET.parse(file).getroot())
-	elif _args.run_local or _args.run_global:
+	try:
+		if _args.update_service != None:
+			print updateService(_args.update_service, file)
+		if _args.update_program != None:
+			print updateProgram(_args.update_program, file)
+		if _args.create:
+			print createXMLFile(file)
+		if _args.service:
+			print getService(ET.parse(file).getroot())
+		if _args.copy_to_clipboard:
+			print sendToClipboard(getService(ET.parse(file).getroot()))
+		if _args.program:
+			print getProgram(ET.parse(file).getroot())
 		if _args.run_local:
 			print updateServiceLevel(False, file)
-		else:
+		if _args.run_global:
 			print updateServiceLevel(True, file)
-	elif _args.service_level:	
-		print getServiceLevel(ET.parse(file).getroot())
-	else:
-		print "None"
+		if _args.service_level:   
+			print getServiceLevel(ET.parse(file).getroot())
 	
-  except ET.ParseError, v:
-	print "Error: rebuilding config.xml file...", createXMLFile(file) 
-	#row, column = v.position
-	#print "XML Error: error on row", row, "column", column, ":", v
-
+	except ET.ParseError, v:
+		row, column = v.position
+		print "XML Error: error on row", row, "column", column, ":", v 
+		print "Rebuilding config.xml & the result is this: ", createXMLFile(file) 
 		
-  sys.exit()
-
-if __name__ == "__main__":
-	main()
-	
