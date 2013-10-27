@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.7.7-1
+	Version: 0.7.7-2
 	Author: Jason Campisi
 	Date: 9.7.2013
 	License: GPL
@@ -380,10 +380,12 @@ on run
 		msg(titlemsg, "Warning " & service, message)
 		killRunningApp()
 		copyServiceToClipboard()
+		delay countdown / 2 #pause to display DNC message as a banner
 		return #exit SSH-Check
 	else if isServiceAlive is equal to 0 then
 		msg(titlemsg, "Warning about " & service, "Don't run " & program & ", because there's no connection to " & service & ".")
 		copyServiceToClipboard()
+		delay countdown / 2 #pause to display DNC message as a banner
 		return #exit SSH-Check
 	end if
 	
