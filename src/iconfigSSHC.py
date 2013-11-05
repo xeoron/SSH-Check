@@ -1,7 +1,7 @@
 #!/usr/bin/python
 __author__ = 'Jason Campisi'
 # Program: iconfigSSHC.py 
-ver = "version 0.5.4"
+ver = "version 0.5.5"
 # Author: Jason Campisi
 # Date: 9.29.13
 # License: GPL 2 or higher
@@ -108,7 +108,6 @@ def loadConfig(file):
 		row, column = v.position
 		print "XML Error: error on row", row, "column", column, ":", v 
 		raise
-	
 	if p !=None:
 		global program
 		program = p
@@ -135,7 +134,6 @@ def updateService(server, file):
 		loadConfig(file)
 		global service 
 		service = server
-		global program
 		return createXMLFile(file)
 	except Exception:
 		return False
