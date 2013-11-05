@@ -1,7 +1,7 @@
 #!/usr/bin/python
 __author__ = 'Jason Campisi'
 # Program: iconfigSSHC.py 
-ver = "version 0.5.3"
+ver = "version 0.5.4"
 # Author: Jason Campisi
 # Date: 9.29.13
 # License: GPL 2 or higher
@@ -34,19 +34,19 @@ service = "tunnelr.com"
 localOrGlobal = "locally"
 
 def getProgram(root):
-	"""Returns program name in xml file or returns None"""
+	"""Returns 1st program name in xml file or returns None"""
 	for settings in root.findall('settings'):
 		return settings.find('program').text
 	return None
 
 def getService(root):
-	"""Returns service name in xml file or returns None"""
+	"""Returns 1st service name in xml file or returns None"""
 	for settings in root.findall('settings'):
 		return settings.find('service').text
 	return None
 
 def getServiceLevel(root):
-	"""Returns service level, where to either to search only if 
+	"""Returns 1st service level, where to either to search only if 
 	local user is running the service or if anyone is running it"""
 	for settings in root.findall('settings'):
 		return settings.find('servicelevel').text
