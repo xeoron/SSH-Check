@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.8.1
+	Version: 0.8.1-1
 	Author: Jason Campisi
 	Date: 9.7.2013->2014
 	License: GPL
@@ -405,11 +405,11 @@ on run
 				if bttnPress is "Cancel" then
 					return null
 				else if xSeconds is greater than 0 then
-					--msg("sleep in " & xSeconds & " seconds!","sleep in " & xSeconds & " seconds!","sleep in " & xSeconds & " seconds!")
+					msg("Closing " & program, "Waiting " & xSeconds & " seconds!", "...")
 					delay xSeconds
 				end if
 			on error
-				msg("error", "Can't evaluate data", "null")
+				msg("SSH-Check: Error", "Can't evaluate wait time...", "Killing self now!")
 				return null
 			end try
 			killRunningApp()
