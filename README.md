@@ -17,7 +17,8 @@ You can either put in number value or use a math expression for Shutdown in X nu
 	"60*10" --> 600 seconds trans. 10 minutes
 	"3600/2" --> 1800 seconds trans. 30 minutes
 	"3600+3600/2" --> 5400 seconds trans. 1.5 hours
-	Note: Whatever is provided is enumerated using <a href="https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/bc.1.html" title="bc man page">bc</a> program
+
+Note: Whatever is provided is enumerated using <a href="https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/bc.1.html" title="bc man page">bc</a> program
 
 If the there is no SSH connection to the server, then the service name will be copied to the system clipboard.
 
