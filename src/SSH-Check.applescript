@@ -1,9 +1,9 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.7.7-2
+	Version: 0.8.0
 	Author: Jason Campisi
-	Date: 9.7.2013
+	Date: 9.7.2013->2014
 	License: GPL
 	Purpose: Only start a app if the system is signed into a SSH service.
 	
@@ -398,9 +398,20 @@ on run
 		if choice is "Restart" then
 			killRunningApp()
 		else if choice is "Turn Off" then
+			try --shut off in x number of seconds
+				set bttnPress to display dialog "Timer: Turn " & program & " off in how many seconds?" default answer 0 with title titlemsg giving up after 60
+				set t to text returned of result as number
+				if bttnPress is "Cancel" then
+					return null
+				else if t is greater than 0 then
+					delay t
+				end if
+			on error
+				return null
+			end try
 			killRunningApp()
 			return #exit SSH-Check
-		else #choice equals Cancel
+		else #choice equals Exit SH-Check
 			return #exit SSH-Check
 		end if
 	else
