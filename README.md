@@ -11,7 +11,8 @@ Sometimes you don't realize that the SSH connection has timed-out or dropped for
 
 It will launch the pre-set program, only if there is a SSH connection to tunnelr.com (this can be changed, see below details). And, if the program of choice is already running, SSH-Check will then ask you to either Restart It or Force It To Stop Running in X number of seconds (default is 0) or Do Nothing; but if there is no SSH connection while the program is running, then it will force the program exit.
 
-You can either put in number value or use a math expression for Shutdown in X number of seconds. Therefore 
+You can either put in number value or use a math expression for Shutdown in X number of seconds. Therefore the following is true:
+
 	"60" seconds is 60 seconds
 	"60*10" --> 600 seconds trans. 10 minutes
 	"3600/2" --> 1800 seconds trans. 30 minutes
