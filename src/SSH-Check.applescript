@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.8.1-1
+	Version: 0.8.2
 	Author: Jason Campisi
 	Date: 9.7.2013->2014
 	License: GPL
@@ -402,10 +402,11 @@ on run
 				set bttnPress to display dialog "Timer: Turn " & program & " off in how many seconds?" default answer 0 with title titlemsg giving up after 60
 				set cmd to "echo " & (text returned of result as string) & " | bc"
 				set xSeconds to do shell script cmd
+				set humanReadableTime to do shell script "echo \"\" | awk -v \"S=" & xSeconds & "\" '{printf \"%dh:%dm:%ds\",S/(60*60),S%(60*60)/60,S%60}'"
 				if bttnPress is "Cancel" then
 					return null
 				else if xSeconds is greater than 0 then
-					msg("Closing " & program, "Waiting " & xSeconds & " seconds!", "...")
+					msg("Closing " & program, "Waiting " & humanReadableTime & "!", "...")
 					delay xSeconds
 				end if
 			on error
