@@ -11,6 +11,13 @@ Sometimes you don't realize that the SSH connection has timed-out or dropped for
 
 It will launch the pre-set program, only if there is a SSH connection to tunnelr.com (this can be changed, see below details). And, if the program of choice is already running, SSH-Check will then ask you to either Restart It or Force It To Stop Running in X number of seconds (default is 0) or Do Nothing; but if there is no SSH connection while the program is running, then it will force the program exit.
 
+You can either put in number value or use a math expression for Shutdown in X number of seconds. Therefore 
+	"60" seconds is 60 seconds
+	"60*10" --> 600 seconds trans. 10 minutes
+	"3600/2" --> 1800 seconds trans. 30 minutes
+	"3600+3600/2" --> 5400 seconds trans. 1.5 hours
+	Note: Whatever is provided is enumerated using <a href="https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/bc.1.html" title="bc man page">bc</a> program
+
 If the there is no SSH connection to the server, then the service name will be copied to the system clipboard.
 
 Program Defaults

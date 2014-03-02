@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.8.0
+	Version: 0.8.1
 	Author: Jason Campisi
 	Date: 9.7.2013->2014
 	License: GPL
@@ -400,13 +400,16 @@ on run
 		else if choice is "Turn Off" then
 			try --shut off in x number of seconds
 				set bttnPress to display dialog "Timer: Turn " & program & " off in how many seconds?" default answer 0 with title titlemsg giving up after 60
-				set t to text returned of result as number
+				set cmd to "echo " & (text returned of result as string) & " | bc"
+				set xSeconds to do shell script cmd
 				if bttnPress is "Cancel" then
 					return null
-				else if t is greater than 0 then
-					delay t
+				else if xSeconds is greater than 0 then
+					--msg("sleep in " & xSeconds & " seconds!","sleep in " & xSeconds & " seconds!","sleep in " & xSeconds & " seconds!")
+					delay xSeconds
 				end if
 			on error
+				msg("error", "Can't evaluate data", "null")
 				return null
 			end try
 			killRunningApp()
