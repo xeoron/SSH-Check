@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.8.2
+	Version: 0.8.3
 	Author: Jason Campisi
 	Date: 9.7.2013->2014
 	License: GPL
@@ -231,25 +231,25 @@ on sshCheckSettings() #return bool
 						end try
 						delay 0.5
 					end if #end of "Yes" go setup DNCA
-				end if
-				
-				if FolderExists(configPath) is true and FileExists(DNCLocation) is false then
-					#setup display notification center workflow
-					set DNWorkflow to "Display_Notification.workflow.zip"
-					set cmdUnzipDNWorkflow to mypath & "unzip -u" & space & DNWorkflow
-					set cmdCleanUpDNWorkflow to mypath & "rm -rf __MACOSX/" & space & DNWorkflow
-					try
-						do shell script mypath & "cp " & supportLoc & DNWorkflow & space & "./"
-					end try
-					delay 0.5
 					
-					if FileExists(configPath & "/" & DNWorkflow) is true then
+					if FolderExists(configPath) is true and FileExists(DNCLocation) is false then
+						#setup display notification center workflow
+						set DNWorkflow to "Display_Notification.workflow.zip"
+						set cmdUnzipDNWorkflow to mypath & "unzip -u" & space & DNWorkflow
+						set cmdCleanUpDNWorkflow to mypath & "rm -rf __MACOSX/" & space & DNWorkflow
 						try
-							do shell script cmdUnzipDNWorkflow
-							do shell script cmdCleanUpDNWorkflow
+							do shell script mypath & "cp " & supportLoc & DNWorkflow & space & "./"
 						end try
+						delay 0.5
+						
+						if FileExists(configPath & "/" & DNWorkflow) is true then
+							try
+								do shell script cmdUnzipDNWorkflow
+								do shell script cmdCleanUpDNWorkflow
+							end try
+						end if
 					end if
-				end if
+				end if #os x.8 only
 			end if
 		on error
 			msg("Setup Failed:", "", configPath)
@@ -453,3 +453,4 @@ on run
 	end try
 	
 end run
+
