@@ -2,7 +2,7 @@ SSH-Check
 =====
 Purpose: 
 
-	To launch program X only if there is a specific SSH connection presently active.
+	To launch program X, only, if there is a specific SSH connection active on the computer.
 
 <img src="https://github.com/xeoron/SSH-Check/blob/master/images/sshcheck_screenshot.png?raw=true"/>
 
@@ -11,7 +11,7 @@ Sometimes you don't realize that the SSH connection has timed-out or dropped for
 
 It will launch the pre-set program, only if there is a SSH connection to tunnelr.com (this can be changed, see below details). And, if the program of choice is already running, SSH-Check will then ask you to either Restart It or Force It To Stop Running in X number of seconds (default is 0) or Do Nothing; but if there is no SSH connection while the program is running, then it will force the program exit.
 
-You can either put in number value or use a math expression for Shutdown in X number of seconds. Therefore the following is true:
+Shutdown in in X number of seconds can either take a number value or use a math expression for how many seconds to wait before stopping program that requires a SSH connection (for instance Firefox using a SOCK Proxy). This lets you do the following:
 
 	"60" seconds is 60 seconds
 	"60*10" --> 600 seconds trans. 10 minutes
@@ -20,7 +20,7 @@ You can either put in number value or use a math expression for Shutdown in X nu
 
 Note: Whatever is provided is enumerated using <a href="https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/bc.1.html" title="bc man page">bc</a> program
 
-If the there is no SSH connection to the server, then the service name will be copied to the system clipboard.
+Finally, if SSH-Check finds there is no SSH connection to the server, then the service name will be copied to the system clipboard.
 
 Program Defaults
 ======
