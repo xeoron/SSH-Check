@@ -11,7 +11,7 @@ Sometimes you don't realize that the SSH connection has timed-out or dropped for
 
 It will launch the pre-set program, only if there is a SSH connection to tunnelr.com (this can be changed, see below details). And, if the program of choice is already running, SSH-Check will then ask you to either Restart It, Exit SSH-Check, or Turn Off Program X in Y number of seconds (default is 0). But, if there is no SSH connection while the program is running, then it will force the program exit.
 
-Shutdown in in X number of seconds can either take a number value or use a math expression for how many seconds to wait before stopping program that requires a SSH connection (for instance Firefox using a SOCK Proxy). This lets you do the following:
+Shutdown in X number of seconds can either take a number value or use a math expression for how many seconds to wait before stopping program that requires a SSH connection (for instance Firefox using a SOCK Proxy). This lets you do the following:
 
 	"60" seconds is 60 seconds
 	"60*10" --> 600 seconds trans. 10 minutes
