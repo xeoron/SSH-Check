@@ -20,8 +20,11 @@ Shutdown in X number of seconds can either take a number value or use a math exp
 	"3600/2" --> 1800 seconds trans. 30 minutes
 	"3600+3600/2" --> 5400 seconds trans. 1.5 hours
 
+Whatever expression is given in seconds, it will be converted into human readable time of hours:minutes:seconds, and you will be asked if this is accurate. 
+
 <img src="https://github.com/xeoron/SSH-Check/blob/master/images/confirm_seconds.png?raw=true"/>
-Whatever expression is given in seconds, it will be converted into human readable time of hours:minutes:seconds, and you will be asked if this is accurate. Otherwise, you can provide a new wait time.
+
+Otherwise, you can provide a new wait time.
 
 Note: Whatever is provided is enumerated using <a href="https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/bc.1.html" title="bc man page">bc</a> program
 
