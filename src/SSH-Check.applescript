@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.8.3
+	Version: 0.8.4
 	Author: Jason Campisi
 	Date: 9.7.2013->2014
 	License: GPL
@@ -397,28 +397,34 @@ on run
 		set choice to button returned of (display dialog qMsg buttons btnOpt default button "Exit SSH-Check" with title titlemsg)
 		if choice is "Restart" then
 			killRunningApp()
-		else if choice is "Turn Off" then
-			try --shut off in x number of seconds
-				set bttnPress to display dialog "Timer: Turn " & program & " off in how many seconds?" default answer 0 with title titlemsg giving up after 60
-				set cmd to "echo " & (text returned of result as string) & " | bc"
-				set xSeconds to do shell script cmd
-				set humanReadableTime to do shell script "echo \"\" | awk -v \"S=" & xSeconds & "\" '{printf \"%dh:%dm:%ds\",S/(60*60),S%(60*60)/60,S%60}'"
-				if bttnPress is "Cancel" then
+		else if choice is "Turn Off" then --shut off in x number of seconds
+			set answer to "No"
+			repeat while answer = "No" #once the answer switches to Yes, it will break the loop or if a error is thrown
+				try
+					set bttnPress to display dialog "Timer: Turn " & program & " off in how many seconds?" default answer 0 with title titlemsg giving up after 60
+					set cmd to "echo " & (text returned of result as string) & " | bc"
+					if bttnPress is "Cancel" then
+						return null
+					end if
+					set xSeconds to do shell script cmd
+					set humanReadableTime to do shell script "echo \"\" | awk -v \"S=" & xSeconds & "\" '{printf \"%dh:%dm:%ds\",S/(60*60),S%(60*60)/60,S%60}'"
+					set bttnOpt to {"Yes", "No"}
+					set answer to button returned of (display dialog "Are you sure you want to wait: " & humanReadableTime buttons bttnOpt default button "Yes" with title titlemsg)
+					if answer is equal to "Yes" and xSeconds is greater than 0 then
+						msg("Closing " & program, "Waiting " & humanReadableTime & "!", "...")
+						delay xSeconds - 0.005
+					end if
+				on error
+					msg("SSH-Check: Error", "Can't evaluate wait time...", "SSH-Check is terminating itself!")
 					return null
-				else if xSeconds is greater than 0 then
-					msg("Closing " & program, "Waiting " & humanReadableTime & "!", "...")
-					delay xSeconds
-				end if
-			on error
-				msg("SSH-Check: Error", "Can't evaluate wait time...", "Killing self now!")
-				return null
-			end try
+				end try
+			end repeat
 			killRunningApp()
 			return #exit SSH-Check
 		else #choice equals Exit SH-Check
 			return #exit SSH-Check
 		end if
-	else
+	else #start the program
 		set qMsg to "Starting " & program & space
 		if DisplayNoticeCenter is equal to true then
 			msg("SSH-Check", isServiceAlive & space & "is active", qMsg & "up now!")
