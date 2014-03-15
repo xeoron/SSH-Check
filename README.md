@@ -9,7 +9,9 @@ Purpose:
 Why is this useful?
 Sometimes you don't realize that the SSH connection has timed-out or dropped for any number of other reasons, which is important if you want to ensure your SOCK Proxy is running before running your web-browser, use your network file-manager or secure your IM , or even bit-torrent program.
 
-It will launch the pre-set program, only if there is a SSH connection to tunnelr.com (this can be changed, see below details). But, if there is no SSH connection and the program X is running, then it will force the program to exit. Furthermore, if the program of choice is already running with SSH tunnel found, SSH-Check will then ask you to either Restart It, Exit SSH-Check, or Turn Off program X in Y number of seconds (default is 0).
+It will launch the pre-set program, only if there is a SSH connection to tunnelr.com (this can be changed, see below details). But, if there is no SSH connection and the program X is running, then it will force the program to exit. 
+
+Furthermore, if the program of choice is already running with a SSH tunnel found, SSH-Check will then ask you to either Restart It, Exit SSH-Check, or Turn Off program X in Y number of seconds (default is 0).
 
 Shutdown in X number of seconds can either take a number value or use a math expression for how many seconds to wait before stopping program that requires a SSH connection (for instance Firefox using a SOCK Proxy). This lets you do the following:
 
