@@ -41,9 +41,13 @@ def getTimeHMS(sec):
 		#convert seconds, then remove 1 or more 0's so there is 0h:0m:0s and not 00h:000m:00s
 		t = str(datetime.timedelta(seconds=sec)).split(":")
 		for i in range (len(t)): #use len so that if the time is more than 1 day, it can handle it too
-			if t[i].count("0") > 1: 
-				t[i] = "0"
-		return t[0] + ' hour, ' + t[1] + ' minute, ' + t[2] + ' second' 
+			#strip out unneeded zeros, so that 00 or 09 bexome 0 & 9
+			if t[i].count("0") >=2:
+				t[i]="0"
+			if t[i].isdigit() and int(t[i]) >0 and int(t[i]) <= 9:
+				t[i]=str(int(t[i])) 
+				#t[i]=t[i][1:]
+		return t[0] + ' hours, ' + t[1] + ' minutes, and ' + t[2] + ' seconds' 
 	return None
 
 def getProgram(root):

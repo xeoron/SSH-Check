@@ -1,7 +1,7 @@
 #!/usr/bin/python
 __author__ = 'Jason Campisi'
 # Program: iconfigSSHC.py 
-ver = "version 0.5.3"
+ver = "version 0.6.0"
 # Author: Jason Campisi
 # Date: 9.29.13
 # License: GPL 2 or higher
@@ -33,20 +33,37 @@ program = "Firefox"
 service = "tunnelr.com"
 localOrGlobal = "locally"
 
+def getTimeHMS(sec):
+	"""convert seconds into Hours:Minutes:Seconds"""
+	if sec.isdigit():
+		sec = int(sec)
+		import datetime
+		#convert seconds, then remove 1 or more 0's so there is 0h:0m:0s and not 00h:000m:00s
+		t = str(datetime.timedelta(seconds=sec)).split(":")
+		for i in range (len(t)): #use len so that if the time is more than 1 day, it can handle it too
+			#strip out unneeded zeros, so that 00 or 09 bexome 0 & 9
+			if t[i].count("0") >=2:
+				t[i]="0"
+			if t[i].isdigit() and int(t[i]) >0 and int(t[i]) <= 9:
+				t[i]=str(int(t[i])) 
+				#t[i]=t[i][1:]
+		return t[0] + ' hours, ' + t[1] + ' minutes, and ' + t[2] + ' seconds' 
+	return None
+
 def getProgram(root):
-	"""Returns program name in xml file or returns None"""
+	"""Returns 1st program name in xml file or returns None"""
 	for settings in root.findall('settings'):
 		return settings.find('program').text
 	return None
 
 def getService(root):
-	"""Returns service name in xml file or returns None"""
+	"""Returns 1st service name in xml file or returns None"""
 	for settings in root.findall('settings'):
 		return settings.find('service').text
 	return None
 
 def getServiceLevel(root):
-	"""Returns service level, where to either to search only if 
+	"""Returns 1st service level, where to either to search only if 
 	local user is running the service or if anyone is running it"""
 	for settings in root.findall('settings'):
 		return settings.find('servicelevel').text
@@ -108,7 +125,6 @@ def loadConfig(file):
 		row, column = v.position
 		print "XML Error: error on row", row, "column", column, ":", v 
 		raise
-	
 	if p !=None:
 		global program
 		program = p
@@ -135,7 +151,6 @@ def updateService(server, file):
 		loadConfig(file)
 		global service 
 		service = server
-		global program
 		return createXMLFile(file)
 	except Exception:
 		return False
@@ -182,6 +197,7 @@ if __name__ == "__main__":
 		parser.add_argument('-x','--copy-to-clipboard', help='Copy the Service name to the system clipboard', action='store_true')
 		parser.add_argument('-up','--update-program', help='Update the program name')
 		parser.add_argument('-us','--update-service', help='Update the service name')
+		parser.add_argument('-hms','--hour-minute-second', help='Convert seconds into h:m:s')
 		parser.add_argument('-v','--version', action='version', version=ver)
 	 
 		if len(sys.argv)==1:
@@ -197,6 +213,8 @@ if __name__ == "__main__":
 		sys.exit(2)
  
 	try:
+		if _args.hour_minute_second !=None:
+			print getTimeHMS(_args.hour_minute_second)
 		if _args.update_service != None:
 			print updateService(_args.update_service, file)
 		if _args.update_program != None:

@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.8.4
+	Version: 0.8.4-1
 	Author: Jason Campisi
 	Date: 9.7.2013->2014
 	License: GPL
@@ -191,6 +191,7 @@ on sshCheckSettings() #return bool
 				delay 0.5 #note: FileExist will fail, even if true, if the program does not pause first
 			end if
 			
+			#note: in future compare iConfig versions to see if it needs to be updated
 			if FileExists(iconfig) is false then
 				#note: the first time XMLSettings (iconfigSSHC.py) is asked for data it will generate config.xml,
 				#then all other times it will use the data set in the file. And, if config.xml becomes corrupt, iconfigSSHC.py will replace it
@@ -368,6 +369,20 @@ on copyServiceToClipboard()
 	end try
 end copyServiceToClipboard
 
+on hms(sec)
+	-- convert Seconds into a list of Days Hours Minutes Seconds
+	set secInHMS to ""
+	try
+		set secInHMS to do shell script XMLSettings & space & "-hms" & space & sec
+		if secInHMS equals "None"
+		set secInHMS to 0
+		end if
+		error
+		set secInHMS to do shell script "echo \"\" | awk -v \"S=" & sec & "\" '{printf \"%dh:%dm:%ds\",S/(60*60),S%(60*60)/60,S%60}'"
+	end try
+	return secInHMS
+end hms
+
 on run
 	resetProgram()
 	sshCheckSettings()
@@ -407,12 +422,12 @@ on run
 						return null
 					end if
 					set xSeconds to do shell script cmd
-					set humanReadableTime to do shell script "echo \"\" | awk -v \"S=" & xSeconds & "\" '{printf \"%dh:%dm:%ds\",S/(60*60),S%(60*60)/60,S%60}'"
+					set humanReadableTime to hms(xSeconds)
 					set bttnOpt to {"Yes", "No"}
-					set answer to button returned of (display dialog "Are you sure you want to wait: " & humanReadableTime buttons bttnOpt default button "Yes" with title titlemsg)
+					set answer to button returned of (display dialog "Shutdown in " & humanReadableTime & "?" buttons bttnOpt default button "Yes" with title titlemsg)
 					if answer is equal to "Yes" and xSeconds is greater than 0 then
 						msg("Closing " & program, "Waiting " & humanReadableTime & "!", "...")
-						delay xSeconds - 0.005
+						delay xSeconds #sleep until user the provided time runs out
 					end if
 				on error
 					msg("SSH-Check: Error", "Can't evaluate wait time...", "SSH-Check is terminating itself!")
