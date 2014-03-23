@@ -1,7 +1,7 @@
 #!/usr/bin/python
 __author__ = 'Jason Campisi'
 # Program: iconfigSSHC.py 
-ver = "version 0.6.0"
+ver = "0.6.1"
 # Author: Jason Campisi
 # Date: 9.29.13
 # License: GPL 2 or higher
@@ -32,6 +32,23 @@ except ImportError:
 program = "Firefox"
 service = "tunnelr.com"
 localOrGlobal = "locally"
+
+
+def versionCompare(version1, version2):
+    parts1 = [int(x) for x in version1.split('.')]
+    parts2 = [int(x) for x in version2.split('.')]
+
+    # fill up the shorter version with zeros ...
+    lendiff = len(parts1) - len(parts2)
+    if lendiff > 0:
+        parts2.extend([0] * lendiff)
+    elif lendiff < 0:
+        parts1.extend([0] * (-lendiff))
+
+    for i, p in enumerate(parts1):
+        ret = cmp(p, parts2[i])
+        if ret: return ret
+    return 0
 
 def getTimeHMS(sec):
 	"""convert seconds into Hours:Minutes:Seconds"""
@@ -185,7 +202,10 @@ if __name__ == "__main__":
 
 		parser = argparse.ArgumentParser(
 			prog='iconfigSSHC.py',
-			description='Manage SSH-Check\'s config file or generate one when needed. XML management is a pain in Applescript, so this is python script is meant to create serenity from chaos. The goal is to call a xml script with option X and capture Y result from STDIN',
+			description="""Manage SSH-Check\'s config file or generate one when needed. 
+			XML management is a pain in Applescript, so this is python script is meant 
+			to create serenity from chaos. The goal is to call a xml script with option 
+			X and capture Y result from STDIN""",
 		) 
 		parser.add_argument('-s','--service', help='Find the service name', action='store_true')
 		parser.add_argument('-sl','--service-level', help='Get service level. Search locally or globally?', action='store_true')
@@ -198,6 +218,10 @@ if __name__ == "__main__":
 		parser.add_argument('-up','--update-program', help='Update the program name')
 		parser.add_argument('-us','--update-service', help='Update the service name')
 		parser.add_argument('-hms','--hour-minute-second', help='Convert seconds into h:m:s')
+		parser.add_argument('-vc','--version-compare', help=
+			"""Compare this program version to another version number, to see which is newer. 
+			Provide version number in this formate: "xxx.xxx.xxx" where xxx is a number. 
+			Results are in the -1 if the current program is older, 0 when they are equal, and -1 when the currnet program is newer.""")
 		parser.add_argument('-v','--version', action='version', version=ver)
 	 
 		if len(sys.argv)==1:
@@ -233,6 +257,8 @@ if __name__ == "__main__":
 			print updateServiceLevel(True, file)
 		if _args.service_level:   
 			print getServiceLevel(ET.parse(file).getroot())
+		if _args.version_compare !=None:
+			print versionCompare(ver, _args.version_compare)
 	
 	except ET.ParseError, v:
 		row, column = v.position

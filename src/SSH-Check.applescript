@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.8.4-1
+	Version: 0.8.4-2
 	Author: Jason Campisi
 	Date: 9.7.2013->2014
 	License: GPL
@@ -108,7 +108,8 @@ on updateXML(programName)
 					return true
 				end if
 			end if
-			error
+		on error
+			return false
 		end try
 	end if
 	return false
@@ -122,7 +123,8 @@ on setupService()
 				copy ser to service
 				return true
 			end if
-			error
+		on error
+			return false
 		end try
 	end if
 	if service is "" then
@@ -139,14 +141,13 @@ on setServiceLevel()
 			set slevel to do shell script XMLSettings & space & "-sl"
 			if slevel is equal to "globally" then
 				set ServiceLevel to true
-			else if slevel is equal to "locally" then
-				set ServiceLevel to false
-			else
+			else # slevel is equal to "locally" then
 				set ServiceLevel to false
 			end if
 			#msg("service level", "", slevel & " = " & ServiceLevel)
 			return ServiceLevel
-			error
+		on error
+			return false
 		end try
 	end if
 	
@@ -164,7 +165,8 @@ on setupProgram()
 				copy prog to program
 				return true
 			end if
-			error
+		on error
+			return false
 		end try
 	end if
 	if program is "" then
@@ -183,7 +185,6 @@ on sshCheckSettings() #return bool
 		## Note: a copy of the workflow folder, DNC action-script, and iconfigSSHC.py master copy is stored inside SSH-Check binary 
 		set mypath to "cd " & configPath & space & "&&" & space
 		set supportLoc to (POSIX path of (path to me as string)) & "Contents/Support/"
-		
 		try
 			if FolderExists(configPath) is false then
 				set cmdMakePath to "mkdir -p" & space & configPath
@@ -191,7 +192,6 @@ on sshCheckSettings() #return bool
 				delay 0.5 #note: FileExist will fail, even if true, if the program does not pause first
 			end if
 			
-			#note: in future compare iConfig versions to see if it needs to be updated
 			if FileExists(iconfig) is false then
 				#note: the first time XMLSettings (iconfigSSHC.py) is asked for data it will generate config.xml,
 				#then all other times it will use the data set in the file. And, if config.xml becomes corrupt, iconfigSSHC.py will replace it
@@ -200,6 +200,7 @@ on sshCheckSettings() #return bool
 					do shell script mypath & "chmod +x" & space & XMLSettings
 				end try
 				delay 0.5
+				--else if
 			end if
 			
 			if OSX is 8 then #OS X.8 only install Display Noticafaction Center support
@@ -227,7 +228,7 @@ on sshCheckSettings() #return bool
 						end if
 						try
 							do shell script mypath & "open " & quoted form of "Display Notification Center Alert.action"
-							error
+						on error
 							msg("SSH-Check: Error", "", "Failed to install action script!")
 						end try
 						delay 0.5
@@ -365,7 +366,6 @@ on copyServiceToClipboard()
 	-- copy the service name to the clipboard to easily check in a terminal, webbrowser, etc
 	try
 		do shell script XMLSettings & space & "-x"
-		error
 	end try
 end copyServiceToClipboard
 
@@ -374,10 +374,10 @@ on hms(sec)
 	set secInHMS to ""
 	try
 		set secInHMS to do shell script XMLSettings & space & "-hms" & space & sec
-		if secInHMS equals "None"
-		set secInHMS to 0
+		if secInHMS is equal to "None" then
+			set secInHMS to 0
 		end if
-		error
+	on error
 		set secInHMS to do shell script "echo \"\" | awk -v \"S=" & sec & "\" '{printf \"%dh:%dm:%ds\",S/(60*60),S%(60*60)/60,S%60}'"
 	end try
 	return secInHMS
