@@ -1,7 +1,7 @@
 #!/usr/bin/python
 __author__ = 'Jason Campisi'
 # Program: iconfigSSHC.py 
-ver = "0.6.1"
+ver = "0.6.2"
 # Author: Jason Campisi
 # Date: 9.29.13
 # License: GPL 2 or higher
@@ -221,7 +221,7 @@ if __name__ == "__main__":
 		parser.add_argument('-vc','--version-compare', help=
 			"""Compare this program version to another version number, to see which is newer. 
 			Provide version number in this formate: "xxx.xxx.xxx" where xxx is a number. 
-			Results are in the -1 if the current program is older, 0 when they are equal, and -1 when the currnet program is newer.""")
+			Results are in the -1 if the current program is older, 0 when they are equal, and 1 when the current program is newer.""")
 		parser.add_argument('-v','--version', action='version', version=ver)
 	 
 		if len(sys.argv)==1:

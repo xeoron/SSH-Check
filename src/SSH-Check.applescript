@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.8.4-2
+	Version: 0.9.0
 	Author: Jason Campisi
 	Date: 9.7.2013->2014
 	License: GPL
@@ -96,6 +96,8 @@ on FolderExists(theFolder)
 end FolderExists
 
 on updateXML(programName)
+	#note: the first time XMLSettings (iconfigSSHC.py) is asked for data it will generate config.xml,
+	#then all other times it will use the data set in the file. And, if config.xml becomes corrupt, iconfigSSHC.py will replace it
 	if FileExists(XMLSettings) is true then
 		try
 			set update to do shell script XMLSettings & space & "-up" & space & quoted form of programName
@@ -175,16 +177,51 @@ on setupProgram()
 	return false
 end setupProgram
 
+on vcmp()
+	(*  versionCompareProgram for iconfigSSHC.py
+	Results translation
+	-1 if the current program installed is older
+	0 when both programs are equal and
+	1 when the current program is newer
+*)
+	set supportLoc to (POSIX path of (path to me as string)) & "Contents/Support/"
+	
+	try
+		set cmd to "cd " & supportLoc & "; ./compareVersions.py"
+		set iver to (do shell script cmd) as number
+		return iver
+	on error
+		return "Error"
+	end try
+end vcmp
+
+on copyiConfig()
+	set iconfig to "~/.ssh-check/iconfigSSHC.py"
+	if FileExists(iconfig) is false or vcmp() is equal to 1 then
+		set mypath to "cd " & "~/.ssh-check" & space & "&&" & space
+		set supportLoc to (POSIX path of (path to me as string)) & "Contents/Support/"
+		#display dialog "Upgrading your copy of  " & mypath & "cp " & supportLoc & "iconfigSSHC.py  to update the version here ~/.ssh-check/" with title iconfig
+		try
+			do shell script mypath & "cp " & supportLoc & "iconfigSSHC.py ./"
+			do shell script mypath & "chmod +x" & space & XMLSettings
+		on error
+			msg("Error", "Failed to setup iconfigSSHC.py", "")
+		end try
+		delay 0.5
+	end if
+	
+end copyiConfig
+
 on sshCheckSettings() #return bool
 	set configFolder to ".ssh-check"
 	set configPath to "~/" & configFolder
 	set iconfig to "~/.ssh-check/iconfigSSHC.py"
+	set mypath to "cd " & configPath & space & "&&" & space
+	set supportLoc to (POSIX path of (path to me as string)) & "Contents/Support/"
 	
 	if FolderExists(configPath) is false or FileExists(iconfig) is false or (OSX is 8 and (FileExists(DNCLocation) is false or FileExists(DNCA) is false)) then
 		## setup path, display notification data, and config file manager
 		## Note: a copy of the workflow folder, DNC action-script, and iconfigSSHC.py master copy is stored inside SSH-Check binary 
-		set mypath to "cd " & configPath & space & "&&" & space
-		set supportLoc to (POSIX path of (path to me as string)) & "Contents/Support/"
 		try
 			if FolderExists(configPath) is false then
 				set cmdMakePath to "mkdir -p" & space & configPath
@@ -192,16 +229,7 @@ on sshCheckSettings() #return bool
 				delay 0.5 #note: FileExist will fail, even if true, if the program does not pause first
 			end if
 			
-			if FileExists(iconfig) is false then
-				#note: the first time XMLSettings (iconfigSSHC.py) is asked for data it will generate config.xml,
-				#then all other times it will use the data set in the file. And, if config.xml becomes corrupt, iconfigSSHC.py will replace it
-				try
-					do shell script mypath & "cp " & supportLoc & "iconfigSSHC.py ./"
-					do shell script mypath & "chmod +x" & space & XMLSettings
-				end try
-				delay 0.5
-				--else if
-			end if
+			copyiConfig()
 			
 			if OSX is 8 then #OS X.8 only install Display Noticafaction Center support
 				if FileExists(DNCA) is false then
@@ -267,6 +295,8 @@ on sshCheckSettings() #return bool
 			msg("SSH-Check: Setup", configPath & " settings are current.", "Display Notification Center Is Active!")
 			delay 1
 		end if
+	else if FolderExists(configPath) is true and vcmp() is equal to 1 then
+		copyiConfig()
 	end if
 	
 	#loadSettings from config file
