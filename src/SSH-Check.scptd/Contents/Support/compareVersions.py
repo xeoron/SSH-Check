@@ -1,11 +1,12 @@
 #!/usr/bin/python
 __author__ = 'Jason Campisi'
 # Program: compareVersions.py 
-ver = "0.1.0"
+#note: this throws an error if not run from within the current directory. Quark in os.getcdw()
+ver = "0.1.1"
 import os, sys, getpass, subprocess
 
 """Compare iconfigSSHC.py program version to another copy, to see which is newer. 
-      Provide version number in this formate: "xxx.xxx.xxx" where xxx is a number. 
+      Provide version number in this format: "xxx.xxx.xxx" where xxx is a number. 
       Results are in the -1 if the current program is older, 0 when they are equal, 
       and 1 when the current program is newer."""
 
