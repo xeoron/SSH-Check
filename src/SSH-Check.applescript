@@ -1,7 +1,7 @@
 #! /usr/bin/osascript
 (*
 	Name: SSH-Check
-	Version: 0.9.0
+	Version: 0.9.1
 	Author: Jason Campisi
 	Date: 9.7.2013->2014
 	License: GPL
@@ -452,6 +452,8 @@ on run
 						return null
 					end if
 					set xSeconds to do shell script cmd
+					#don't wait to confirm leaving if 0 time is given, otherwise confirm all other wait times before forcing "program" to shutdown
+					if xSeconds ² 0 then exit repeat 
 					set humanReadableTime to hms(xSeconds)
 					set bttnOpt to {"Yes", "No"}
 					set answer to button returned of (display dialog "Shutdown in " & humanReadableTime & "?" buttons bttnOpt default button "Yes" with title titlemsg)
