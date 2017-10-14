@@ -63,7 +63,6 @@ def getTimeHMS(sec):
 				t[i]="0"
 			if t[i].isdigit() and int(t[i]) >0 and int(t[i]) <= 9:
 				t[i]=str(int(t[i])) 
-				#t[i]=t[i][1:]
 		return t[0] + ' hours, ' + t[1] + ' minutes, and ' + t[2] + ' seconds' 
 	return None
 

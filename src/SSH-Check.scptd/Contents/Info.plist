@@ -8,6 +8,10 @@
 	<string>SSH-Check</string>
 	<key>WindowState</key>
 	<dict>
+		<key>bundleDividerCollapsed</key>
+		<true/>
+		<key>bundlePositionOfDivider</key>
+		<real>0.0</real>
 		<key>dividerCollapsed</key>
 		<false/>
 		<key>eventLogLevel</key>
@@ -17,9 +21,9 @@
 		<key>positionOfDivider</key>
 		<real>571</real>
 		<key>savedFrame</key>
-		<string>89 56 1581 967 0 0 1920 1058 </string>
-		<key>selectedTabView</key>
-		<string>event log</string>
+		<string>355 25 1581 967 0 0 1920 1057 </string>
+		<key>selectedTab</key>
+		<string>log</string>
 	</dict>
 </dict>
 </plist>
