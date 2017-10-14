@@ -17,15 +17,19 @@ Step 0)
 
 In the Terminal run the below commands
 Step 1) 
+
     sudo mv ./tunnel_check.sh /opt/local/bin/
 
 Step 2) 
+
     crontab -e
 
 Step 3) 
+
     Press 'i'
 
 Step 4) Paste this into the crontab
+
     * * * * * /bin/bash /opt/local/bin/tunnel_check.sh > /dev/null
 
 Step 5) Press ":wq" followed by the enter key
