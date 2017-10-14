@@ -41,6 +41,6 @@ Mac OS X.11 or higher
 
 License
 =====
-Copyleft 2017 under the <a href="http://www.gnu.org/licenses/gpl-2.0.html">GPL v3</a> or higher.
+Copyleft 2017 under the <a href="http://www.gnu.org/licenses/gpl-3.0.html">GPL v3</a> or higher.
 
 	
